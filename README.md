@@ -1,81 +1,82 @@
-# Startup - Free Next.js Startup Website Template
+# DASOM Frontend
 
-Startup is a free, open-source, and premium-quality [**Next.js startup website template**](https://nextjstemplates.com/templates/startup) that comes with everything you need to launch a startup, business, or SaaS website, including all essential sections, components, and pages.
+**"다솜은 사랑입니다!"**
+경희대학교 컴퓨터공학부 학술동아리 **다솜(DASOM)** 공식 웹사이트 프론트엔드입니다.  
 
-If you're looking for a high-quality and visually appealing, feature-rich Next.js Template for your next startup, SaaS, or business website, this is the perfect choice and starting point for you!
+## 기술 스택
+- Next.js 16 (App Router)
+- React 19 + TypeScript
+- Tailwind CSS v4
+- next-themes (라이트/다크)
+- ESLint + Prettier
 
-### ✨ Key Features
+## 시작하기
+### 요구사항
+- Node.js 20+
+- npm
 
-- Crafted for Startup and SaaS Business
-- Next.js and Tailwind CSS
-- All Essential Business Sections and Pages
-- High-quality and Clean Design
-- Dark and Light Version
-- TypeScript Support
-and Much More ...
+### 설치 및 실행
+```bash
+npm install
+npm run dev
+```
+기본 실행 주소: `http://localhost:3000`
 
-### 🙌 Detailed comparison between the Free and Pro versions of Startup
+### 기타 명령어
+```bash
+npm run build   # 프로덕션 빌드
+npm run start   # 프로덕션 서버 실행
+npm run lint    # 린트
+```
 
-| Feature             | Free | Pro |
-|---------------------|------------|----------|
-| Next.js Landing Page             | ✅ Yes      | ✅ Yes      |
-| All The Integrations - Auth, DB, Payments, Blog and many more ...             | ❌ No      | ✅ Yes |
-| Homepage Variations             | 1      | 2 |
-| Additional SaaS Pages and Components             | ❌ No      | ✅ Yes |
-| Functional Blog with Sanity       | ❌ No      | ✅ Yes |
-| Use with Commercial Projects            | ✅ Yes      | ✅ Yes      |
-| Lifetime Free Updates             | ✅ Yes      | ✅ Yes |
-| Email Support       | ❌ No         | ✅ Yes       |
-| Community Support         | ✅ Yes         | ✅ Yes       |
+## 현재 페이지 구성
+- `/` 홈
+- `/about` 소개
+- `/contact` 문의
+- `/blog` 블로그 그리드
+- `/blog-details` 블로그 상세
+- `/blog-sidebar` 블로그 사이드바
+- `/signin` 로그인
+- `/signup` 회원가입
+- `/error` 에러
 
-### [🔥 Get Startup Pro](https://nextjstemplates.com/templates/saas-starter-startup)
+홈(`src/app/page.tsx`) 주요 섹션 순서:
+1. Hero
+2. Features
+3. Video
+4. Brands
+5. About Section One
+6. About Section Two
+7. Testimonials
+8. Blog
+9. Contact
 
-[![Startup Pro](https://raw.githubusercontent.com/NextJSTemplates/startup-nextjs/main/startup-pro.webp)](https://nextjstemplates.com/templates/saas-starter-startup)
+## 디자인 가이드
+`src/styles/index.css`의 주요 컬러 토큰:
+- `--color-primary: #EC4899` (메인 분홍)
+- `--color-dark: #2F1D30`
+- `--color-bg-color-dark: #281723`
+- `--color-gray-dark: #2E1E2A`
 
-Startup Pro - Expertly crafted for fully-functional, high-performing SaaS startup websites. Comes with with Authentication, Database, Blog, and all the essential integrations necessary for SaaS business sites.
+작업 원칙:
+- 신규 강조색은 기본적으로 `primary` 사용
+- 파란 템플릿 잔여 요소는 분홍 톤으로 순차 교체
+- 라이트/다크 모두 텍스트 대비를 확인
 
-- [🚀 View Free Demo](https://startup.nextjstemplates.com/)
+## 현재 상태 메모
+현재 코드에는 다솜 커스텀과 템플릿 기본 요소가 혼재되어 있습니다.
 
-- [🚀 View Pro Demo](https://startup-pro.nextjstemplates.com/)
+이미 반영된 요소:
+- Hero 문구/메타 일부 다솜화
+- About 섹션의 다솜 설명 및 위치 정보
+- 임원진 소개 섹션 텍스트 일부 반영
 
-- [📦 Download](https://nextjstemplates.com/templates/startup)
+## 디렉터리 개요
+```text
+src/
+  app/           # 라우트 페이지
+  components/    # 섹션/공용 컴포넌트
+  styles/        # 전역 스타일 및 테마 토큰
+public/          # 이미지/정적 리소스
+```
 
-- [🔥 Get Pro](https://nextjstemplates.com/templates/saas-starter-startup)
-
-- [🔌 Documentation](https://nextjstemplates.com/docs)
-
-### ⚡ Deploy Now
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNextJSTemplates%2Fstartup-nextjs)
-
-[![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/NextJSTemplates/startup-nextjs)
-
-### 📄 License
-
-Startup is 100% free and open-source, feel free to use with your personal and commercial projects.
-
-### 💜 Support
-
-If you like the template, please star this repository to inspire the team to create more stuff like this and reach more users like you!
-
-### ✨ Explore and Download - Free [Next.js Templates](https://nextjstemplates.com)
-
-### Update Log
-
-**03 December 2025**
-
-- Upgrade to Next.js 16
-- Fixed video modal issue
-
-**10 April 2025**
-
-- Fix peer deps issue with Next.js 15
-- Upgrade to tailwind v4
-- Refactored blog cards for handling edge cases(text ellipsis on bio, keeping author details at the bottom etc.)
-- Re-wrote blog details page with icons separation, fallback author image and better markup.
-- Fixed duplicate key errors on homepage.
-- Separated icons on theme-switcher button, and refactored scroll-to-top button.
-
-**29 Jan 2025**
-
-- Upgraded to Next.js 15
