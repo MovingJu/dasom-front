@@ -47,7 +47,7 @@ const testimonialData: Testimonial[] = [
 
 const Testimonials = () => {
   return (
-    <section className="bg-[#f4edf2] relative z-10 py-16 dark:bg-[#292428] md:py-20 lg:py-28">
+    <section className="bg-[#f4edf2] relative z-10 py-16 dark:bg-[#222222] md:py-20 lg:py-28">
       <div className="container">
         <SectionTitle
           title="2026년도 임원진을 소개합니다"
