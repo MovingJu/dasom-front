@@ -47,7 +47,7 @@ const testimonialData: Testimonial[] = [
 
 const Testimonials = () => {
   return (
-    <section className="dark:bg-bg-color-dark bg-gray-light relative z-10 py-16 md:py-20 lg:py-28">
+    <section className="bg-[#f4edf2] relative z-10 py-16 dark:bg-[#292428] md:py-20 lg:py-28">
       <div className="container">
         <SectionTitle
           title="2026년도 임원진을 소개합니다"
@@ -98,8 +98,8 @@ const Testimonials = () => {
               y2="459.865"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#4A6CF7" />
-              <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
+              <stop stopColor="#3A3A3A" />
+              <stop offset="1" stopColor="#3A3A3A" stopOpacity="0" />
             </linearGradient>
             <linearGradient
               id="paint1_linear_83:2"
@@ -109,8 +109,8 @@ const Testimonials = () => {
               y2="675.565"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#4A6CF7" />
-              <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
+              <stop stopColor="#3A3A3A" />
+              <stop offset="1" stopColor="#3A3A3A" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>
@@ -150,8 +150,8 @@ const Testimonials = () => {
               y2="8.15715"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#4A6CF7" stopOpacity="0" />
-              <stop offset="1" stopColor="#4A6CF7" />
+              <stop stopColor="#3A3A3A" stopOpacity="0" />
+              <stop offset="1" stopColor="#3A3A3A" />
             </linearGradient>
             <linearGradient
               id="paint1_linear_72:302"
@@ -161,8 +161,8 @@ const Testimonials = () => {
               y2="-2.84285"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#4A6CF7" stopOpacity="0" />
-              <stop offset="1" stopColor="#4A6CF7" />
+              <stop stopColor="#3A3A3A" stopOpacity="0" />
+              <stop offset="1" stopColor="#3A3A3A" />
             </linearGradient>
             <linearGradient
               id="paint2_linear_72:302"
@@ -172,8 +172,8 @@ const Testimonials = () => {
               y2="19.1572"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#4A6CF7" stopOpacity="0" />
-              <stop offset="1" stopColor="#4A6CF7" />
+              <stop stopColor="#3A3A3A" stopOpacity="0" />
+              <stop offset="1" stopColor="#3A3A3A" />
             </linearGradient>
             <linearGradient
               id="paint3_linear_72:302"
@@ -183,8 +183,8 @@ const Testimonials = () => {
               y2="31.1572"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#4A6CF7" stopOpacity="0" />
-              <stop offset="1" stopColor="#4A6CF7" />
+              <stop stopColor="#3A3A3A" stopOpacity="0" />
+              <stop offset="1" stopColor="#3A3A3A" />
             </linearGradient>
           </defs>
         </svg>
