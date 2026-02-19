@@ -55,13 +55,9 @@ const AboutSectionOne = () => {
                   src="/images/about/about-dasom.png"
                   alt="about-image"
                   fill
-                  className="mx-auto max-w-full drop-shadow-three dark:hidden dark:drop-shadow-none lg:mr-0"
-                />
-                <Image
-                  src="/images/about/about-dasom.png"
-                  alt="about-image"
-                  fill
-                  className="mx-auto hidden max-w-full drop-shadow-three dark:block dark:drop-shadow-none lg:mr-0"
+                  sizes="(max-width: 1024px) 100vw, 500px"
+                  priority
+                  className="mx-auto max-w-full drop-shadow-three dark:drop-shadow-none lg:mr-0"
                 />
               </div>
             </div>

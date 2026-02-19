@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { decodeSessionToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -53,6 +54,21 @@ const resolveUniqueSlug = async (baseSlug: string) => {
 };
 
 export async function POST(request: Request) {
+  const token = request.headers
+    .get("cookie")
+    ?.split(";")
+    .map((item) => item.trim())
+    .find((item) => item.startsWith("dasom_session="))
+    ?.replace("dasom_session=", "");
+  const user = decodeSessionToken(token);
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "로그인 후 글 작성이 가능합니다." },
+      { status: 401 },
+    );
+  }
+
   const body = (await request.json()) as CreateBlogBody;
 
   const title = cleanLine(body.title ?? "");

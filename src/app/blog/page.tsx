@@ -1,6 +1,9 @@
 import SingleBlog from "@/components/Blog/SingleBlog";
+import { decodeSessionToken } from "@/lib/auth";
 import { filterBlogPosts, getAllBlogPosts, getAllBlogTags } from "@/lib/blog";
+import { cookies } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { Metadata } from "next";
 
@@ -39,6 +42,19 @@ const Blog = async ({ searchParams }: PageProps) => {
   const q = (params.q ?? "").trim();
   const tag = (params.tag ?? "").trim();
   const view = params.view === "list" ? "list" : "grid";
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("dasom_session")?.value;
+  const user = decodeSessionToken(token);
+
+  if (!user) {
+    const nextParams = new URLSearchParams();
+    if (q) nextParams.set("q", q);
+    if (tag) nextParams.set("tag", tag);
+    if (view) nextParams.set("view", view);
+    const nextPath = nextParams.toString() ? `/blog?${nextParams.toString()}` : "/blog";
+    redirect(`/signin?next=${encodeURIComponent(nextPath)}`);
+  }
 
   const allPosts = await getAllBlogPosts();
   const tags = getAllBlogTags(allPosts);

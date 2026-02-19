@@ -86,7 +86,7 @@ const SingleBlog = ({
                   isList ? "h-8 w-8" : "h-10 w-10"
                 }`}
               >
-                <Image src={authorImage} alt={author.name} fill />
+                <Image src={authorImage} alt={author.name} fill sizes="40px" />
               </div>
             </div>
             <div className="w-full">

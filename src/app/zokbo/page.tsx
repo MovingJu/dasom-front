@@ -1,6 +1,9 @@
 import Breadcrumb from "@/components/Common/Breadcrumb";
+import { decodeSessionToken } from "@/lib/auth";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import zokboData from "@/components/Zokbo/zokboData";
 
 export const metadata: Metadata = {
@@ -8,7 +11,15 @@ export const metadata: Metadata = {
   description: "다솜 족보/시험 자료 다운로드 페이지",
 };
 
-const ZokboPage = () => {
+const ZokboPage = async () => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("dasom_session")?.value;
+  const user = decodeSessionToken(token);
+
+  if (!user) {
+    redirect("/signin?next=%2Fzokbo");
+  }
+
   return (
     <>
       <Breadcrumb

@@ -1,12 +1,16 @@
 "use client";
+
+import type { SessionUser } from "@/lib/auth";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ThemeToggler from "./ThemeToggler";
 import menuData from "./menuData";
 
 const Header = () => {
+  const router = useRouter();
+
   // Navbar toggle
   const [navbarOpen, setNavbarOpen] = useState(false);
   const navbarToggleHandler = () => {
@@ -38,6 +42,36 @@ const Header = () => {
   };
 
   const usePathName = usePathname();
+  const [user, setUser] = useState<SessionUser | null>(null);
+
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const response = await fetch("/api/auth/me", { cache: "no-store" });
+        const data = (await response.json()) as {
+          ok?: boolean;
+          user?: SessionUser | null;
+        };
+
+        if (response.ok && data.ok && data.user) {
+          setUser(data.user);
+          return;
+        }
+        setUser(null);
+      } catch {
+        setUser(null);
+      }
+    };
+
+    fetchMe();
+  }, [usePathName]);
+
+  const onLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setUser(null);
+    router.refresh();
+    router.push("/");
+  };
 
   return (
     <>
@@ -157,19 +191,39 @@ const Header = () => {
                   </ul>
                 </nav>
               </div>
-              <div className="flex items-center justify-end pr-16 lg:pr-0">
-                <Link
-                  href="/signin"
-                  className="text-dark hidden px-7 py-3 text-base font-medium hover:opacity-70 md:block dark:text-white"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="ease-in-up shadow-btn hover:shadow-btn-hover bg-primary hover:bg-primary/90 hidden rounded-xs px-8 py-3 text-base font-medium text-white transition duration-300 md:block md:px-9 lg:px-6 xl:px-9"
-                >
-                  Sign Up
-                </Link>
+              <div className="flex items-center justify-end gap-3 pr-16 lg:pr-0">
+                {user ? (
+                  <div className="hidden items-center gap-2 md:flex">
+                    <div className="bg-primary/15 text-primary inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold">
+                      {user.name.slice(0, 1)}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-dark text-sm font-semibold dark:text-white">{user.name}</p>
+                      <p className="text-body-color text-xs">{user.role}</p>
+                    </div>
+                    <button
+                      onClick={onLogout}
+                      className="rounded-xs border border-primary/40 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10"
+                    >
+                      로그아웃
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <Link
+                      href="/signin"
+                      className="text-dark hidden px-7 py-3 text-base font-medium hover:opacity-70 md:block dark:text-white"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="ease-in-up shadow-btn hover:shadow-btn-hover bg-primary hover:bg-primary/90 hidden rounded-xs px-8 py-3 text-base font-medium text-white transition duration-300 md:block md:px-9 lg:px-6 xl:px-9"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
                 <div>
                   <ThemeToggler />
                 </div>

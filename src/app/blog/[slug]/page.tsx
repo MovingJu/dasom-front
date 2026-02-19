@@ -1,9 +1,11 @@
 import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/blog";
+import { decodeSessionToken } from "@/lib/auth";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import BlogContent from "@/components/Blog/BlogContent";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export async function generateStaticParams() {
   const posts = await getAllBlogPosts();
@@ -33,6 +35,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const BlogDetailPage = async ({ params }: PageProps) => {
   const { slug } = await params;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("dasom_session")?.value;
+  const user = decodeSessionToken(token);
+
+  if (!user) {
+    redirect(`/signin?next=${encodeURIComponent(`/blog/${slug}`)}`);
+  }
+
   const post = await getBlogPostBySlug(slug);
 
   if (!post) {
@@ -55,7 +65,7 @@ const BlogDetailPage = async ({ params }: PageProps) => {
               <div className="mb-5 mr-10 flex items-center">
                 <div className="mr-4">
                   <div className="relative h-10 w-10 overflow-hidden rounded-full">
-                    <Image src={authorImage} alt={post.author.name} fill />
+                    <Image src={authorImage} alt={post.author.name} fill sizes="40px" />
                   </div>
                 </div>
                 <div>
@@ -76,6 +86,7 @@ const BlogDetailPage = async ({ params }: PageProps) => {
                     src={coverImage}
                     alt={post.title}
                     fill
+                    sizes="(max-width: 1024px) 100vw, 900px"
                     className="object-cover object-center"
                   />
                 </div>

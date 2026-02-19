@@ -1,7 +1,10 @@
 import Breadcrumb from "@/components/Common/Breadcrumb";
+import { decodeSessionToken } from "@/lib/auth";
 import zokboData from "@/components/Zokbo/zokboData";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "zokbo-sidebar | DASOM",
@@ -13,6 +16,14 @@ type PageProps = {
 };
 
 const BlogSidebarPage = async ({ searchParams }: PageProps) => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("dasom_session")?.value;
+  const user = decodeSessionToken(token);
+
+  if (!user) {
+    redirect("/signin?next=%2Fblog-sidebar");
+  }
+
   const params = await searchParams;
   const selectedId = Number(params.id ?? zokboData[0]?.id ?? 1);
   const selected =
