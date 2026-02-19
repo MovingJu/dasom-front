@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 type CreateResult = {
@@ -11,16 +12,10 @@ type CreateResult = {
   error?: string;
 };
 
-const today = () => new Date().toISOString().slice(0, 10);
-
 const BlogWriter = () => {
+  const router = useRouter();
   const [title, setTitle] = useState("");
-  const [excerpt, setExcerpt] = useState("");
-  const [date, setDate] = useState(today());
   const [tags, setTags] = useState("");
-  const [authorName, setAuthorName] = useState("");
-  const [authorDesignation, setAuthorDesignation] = useState("");
-  const [authorImage, setAuthorImage] = useState("");
   const [coverImage, setCoverImage] = useState("");
   const [content, setContent] = useState("# 새 글 제목\n\n본문을 작성하세요.");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,18 +41,19 @@ const BlogWriter = () => {
         },
         body: JSON.stringify({
           title,
-          excerpt,
-          date,
           tags,
-          authorName,
-          authorDesignation,
-          authorImage,
           coverImage,
           content,
         }),
       });
 
       const data = (await response.json()) as CreateResult;
+      if (response.ok && data.ok) {
+        router.push("/blog");
+        router.refresh();
+        return;
+      }
+
       setResult(data);
     } catch (error: unknown) {
       const message =
@@ -92,39 +88,9 @@ const BlogWriter = () => {
               className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
             />
             <input
-              value={excerpt}
-              onChange={(e) => setExcerpt(e.target.value)}
-              placeholder="요약문 (선택)"
-              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
-            />
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
-            />
-            <input
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="태그 (쉼표 구분)"
-              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
-            />
-            <input
-              value={authorName}
-              onChange={(e) => setAuthorName(e.target.value)}
-              placeholder="작성자 이름"
-              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
-            />
-            <input
-              value={authorDesignation}
-              onChange={(e) => setAuthorDesignation(e.target.value)}
-              placeholder="작성자 직책"
-              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
-            />
-            <input
-              value={authorImage}
-              onChange={(e) => setAuthorImage(e.target.value)}
-              placeholder="작성자 이미지 경로 (선택)"
               className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
             />
             <input

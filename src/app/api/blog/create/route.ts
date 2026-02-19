@@ -7,12 +7,7 @@ export const runtime = "nodejs";
 
 type CreateBlogBody = {
   title?: string;
-  excerpt?: string;
-  date?: string;
   tags?: string;
-  authorName?: string;
-  authorImage?: string;
-  authorDesignation?: string;
   coverImage?: string;
   content?: string;
 };
@@ -85,29 +80,18 @@ export async function POST(request: Request) {
   const baseSlug = slugify(title);
   const slug = await resolveUniqueSlug(baseSlug);
 
-  const excerpt = cleanLine(body.excerpt ?? "");
   const tags = cleanLine(body.tags ?? "");
-  const authorName = cleanLine(body.authorName ?? "");
-  const authorImage = cleanLine(body.authorImage ?? "");
-  const authorDesignation = cleanLine(body.authorDesignation ?? "");
   const coverImage = cleanLine(body.coverImage ?? "");
-  const date = /^\d{4}-\d{2}-\d{2}$/.test(body.date ?? "")
-    ? (body.date as string)
-    : new Date().toISOString().slice(0, 10);
+  const date = new Date().toISOString().slice(0, 10);
 
   const frontmatterLines = [
     "---",
     `title: ${title}`,
-    `excerpt: ${excerpt || title}`,
     `date: ${date}`,
     `tags: ${tags}`,
-    `authorName: ${authorName}`,
-    `authorDesignation: ${authorDesignation}`,
+    `authorName: ${cleanLine(user.name) || "다솜 운영진"}`,
+    `authorDesignation: ${cleanLine(user.role) || "운영팀"}`,
   ];
-
-  if (authorImage) {
-    frontmatterLines.push(`authorImage: ${authorImage}`);
-  }
 
   if (coverImage) {
     frontmatterLines.push(`coverImage: ${coverImage}`);

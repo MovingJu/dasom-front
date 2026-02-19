@@ -216,7 +216,7 @@ const Blog = async ({ searchParams }: PageProps) => {
       <Link
         href="/blog/write"
         aria-label="블로그 글 작성하기"
-        className="bg-primary hover:bg-primary/90 fixed right-8 bottom-8 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition"
+        className="bg-primary hover:bg-primary/90 fixed bottom-8 left-8 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition"
       >
         <svg
           width="24"

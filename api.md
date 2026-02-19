@@ -142,16 +142,15 @@
 ```json
 {
   "title": "2026 1학기 공지",
-  "excerpt": "요약",
-  "date": "2026-02-19",
   "tags": "공지,스터디",
-  "authorName": "다솜 운영진",
-  "authorDesignation": "홍보팀",
-  "authorImage": "/images/blog/author-default.png",
   "coverImage": "/images/blog/blog-01.jpg",
   "content": "# 본문\n\n마크다운 내용"
 }
 ```
+
+동작:
+- `date`는 서버의 현재 날짜(YYYY-MM-DD)로 자동 저장
+- `authorName`, `authorDesignation`은 로그인 세션 사용자 정보로 자동 저장
 
 ### Success `200`
 ```json
