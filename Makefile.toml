@@ -1,0 +1,15 @@
+[config]
+skip_core_tasks = true
+
+[tasks.default]
+description = "Build and push docker image"
+dependencies = ["docker-build", "docker-push"]
+
+[tasks.docker-build]
+command = "docker"
+args = ["buildx", "build", "--platform=linux/amd64", "-t", "movingju/public:dasom_front", "."]
+
+[tasks.docker-push]
+command = "docker"
+args = ["push", "movingju/public:dasom_front"]
+
