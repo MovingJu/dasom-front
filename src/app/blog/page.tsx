@@ -48,7 +48,7 @@ const Blog = async ({ searchParams }: PageProps) => {
     <>
       <section className="pb-[120px] pt-[120px]">
         <div className="container">
-          <div className="mb-10 rounded-xs bg-white p-5 shadow-three dark:bg-gray-dark">
+          <div className="mb-10 rounded-xs bg-white p-5 shadow-three dark:bg-[#3a3338]">
             <form className="mb-5 flex items-center gap-2" method="get">
               <input
                 type="text"
@@ -170,7 +170,7 @@ const Blog = async ({ searchParams }: PageProps) => {
           </div>
 
           {posts.length === 0 ? (
-            <div className="rounded-xs bg-white p-10 text-center shadow-three dark:bg-gray-dark">
+            <div className="rounded-xs bg-white p-10 text-center shadow-three dark:bg-[#3a3338]">
               <p className="text-body-color">조건에 맞는 글이 없습니다.</p>
             </div>
           ) : null}
@@ -197,6 +197,27 @@ const Blog = async ({ searchParams }: PageProps) => {
           </div>
         </div>
       </section>
+      <Link
+        href="/blog/write"
+        aria-label="블로그 글 작성하기"
+        className="bg-primary hover:bg-primary/90 fixed right-8 bottom-8 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 5V19M5 12H19"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+          />
+        </svg>
+      </Link>
     </>
   );
 };

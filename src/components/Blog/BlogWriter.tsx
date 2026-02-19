@@ -1,0 +1,178 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState } from "react";
+
+type CreateResult = {
+  ok?: boolean;
+  slug?: string;
+  path?: string;
+  detailUrl?: string;
+  error?: string;
+};
+
+const today = () => new Date().toISOString().slice(0, 10);
+
+const BlogWriter = () => {
+  const [title, setTitle] = useState("");
+  const [excerpt, setExcerpt] = useState("");
+  const [date, setDate] = useState(today());
+  const [tags, setTags] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [authorDesignation, setAuthorDesignation] = useState("");
+  const [authorImage, setAuthorImage] = useState("");
+  const [coverImage, setCoverImage] = useState("");
+  const [content, setContent] = useState("# 새 글 제목\n\n본문을 작성하세요.");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [result, setResult] = useState<CreateResult | null>(null);
+
+  const canSubmit = useMemo(
+    () => title.trim().length > 0 && content.trim().length > 0,
+    [title, content],
+  );
+
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!canSubmit) return;
+
+    setIsSubmitting(true);
+    setResult(null);
+
+    try {
+      const response = await fetch("/api/blog/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          excerpt,
+          date,
+          tags,
+          authorName,
+          authorDesignation,
+          authorImage,
+          coverImage,
+          content,
+        }),
+      });
+
+      const data = (await response.json()) as CreateResult;
+      setResult(data);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "요청 처리 중 알 수 없는 오류가 발생했습니다.";
+      setResult({ error: message });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <section className="pb-[120px] pt-[120px]">
+      <div className="container">
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold text-black dark:text-white">블로그 글 작성</h1>
+          <Link
+            href="/blog"
+            className="rounded-xs border border-primary/40 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10 dark:hover:bg-primary/30"
+          >
+            목록으로
+          </Link>
+        </div>
+
+        <form onSubmit={onSubmit} className="space-y-4 rounded-xs bg-white p-6 shadow-three dark:bg-[#3a3338]">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="제목 *"
+              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+            />
+            <input
+              value={excerpt}
+              onChange={(e) => setExcerpt(e.target.value)}
+              placeholder="요약문 (선택)"
+              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+            />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+            />
+            <input
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="태그 (쉼표 구분)"
+              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+            />
+            <input
+              value={authorName}
+              onChange={(e) => setAuthorName(e.target.value)}
+              placeholder="작성자 이름"
+              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+            />
+            <input
+              value={authorDesignation}
+              onChange={(e) => setAuthorDesignation(e.target.value)}
+              placeholder="작성자 직책"
+              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+            />
+            <input
+              value={authorImage}
+              onChange={(e) => setAuthorImage(e.target.value)}
+              placeholder="작성자 이미지 경로 (선택)"
+              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+            />
+            <input
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+              placeholder="커버 이미지 경로 (선택)"
+              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+            />
+          </div>
+
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="border-body-color/20 focus:border-primary h-[420px] w-full rounded-xs border bg-[#f8f8f8] p-4 font-mono text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+            spellCheck={false}
+          />
+
+          <button
+            type="submit"
+            disabled={!canSubmit || isSubmitting}
+            className="bg-primary hover:bg-primary/90 rounded-xs px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-primary/60"
+          >
+            {isSubmitting ? "작성 중..." : "마크다운 글 저장"}
+          </button>
+
+          {result ? (
+            <div className="rounded-xs border border-primary/25 bg-primary/10 p-4 text-sm text-dark dark:text-white">
+              {result.ok ? (
+                <>
+                  저장 완료: <code>{result.path}</code>
+                  {result.detailUrl ? (
+                    <>
+                      {" "}
+                      <Link href={result.detailUrl} className="text-primary underline">
+                        글 보기
+                      </Link>
+                    </>
+                  ) : null}
+                </>
+              ) : (
+                <>실패: {result.error ?? "알 수 없는 오류"}</>
+              )}
+            </div>
+          ) : null}
+        </form>
+      </div>
+    </section>
+  );
+};
+
+export default BlogWriter;

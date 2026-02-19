@@ -39,7 +39,7 @@ const SingleBlog = ({
 
   return (
     <div
-      className={`group shadow-one hover:shadow-two dark:bg-dark dark:hover:shadow-gray-dark relative overflow-hidden rounded-xs bg-white duration-300 ${
+      className={`group shadow-one hover:shadow-two dark:bg-[#3a3338] dark:hover:shadow-gray-dark relative overflow-hidden rounded-xs bg-white duration-300 ${
         isList ? "" : "h-full"
       }`}
     >

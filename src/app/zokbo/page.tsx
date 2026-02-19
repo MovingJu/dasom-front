@@ -24,7 +24,7 @@ const ZokboPage = () => {
                 key={item.id}
                 className="mb-8 w-full px-4 md:w-2/3 lg:w-1/2 xl:w-1/3"
               >
-                <div className="group shadow-one hover:shadow-two dark:bg-dark dark:hover:shadow-gray-dark relative overflow-hidden rounded-xs bg-white duration-300">
+                <div className="group shadow-one hover:shadow-two dark:bg-[#3a3338] dark:hover:shadow-gray-dark relative overflow-hidden rounded-xs bg-white duration-300">
                   <div className="p-6 sm:p-8 md:px-6 md:py-8 lg:p-8 xl:px-5 xl:py-8 2xl:p-8">
                     <h3>
                       <Link
