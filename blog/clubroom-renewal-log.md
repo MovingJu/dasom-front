@@ -4,9 +4,7 @@ excerpt: 동아리방 좌석 재배치, 공용 장비 정리, 사용 수칙 개�
 date: 2025-12-18
 tags: 공지,동아리방,운영
 authorName: 박경희
-authorImage: /images/blog/author-03.png
 authorDesignation: 총무팀
-coverImage: /images/blog/blog-03.jpg
 ---
 
 # 동아리방 리뉴얼 & 장비 정리 기록

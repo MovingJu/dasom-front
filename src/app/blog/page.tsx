@@ -49,7 +49,7 @@ const Blog = async ({ searchParams }: PageProps) => {
       <section className="pb-[120px] pt-[120px]">
         <div className="container">
           <div className="mb-10 rounded-xs bg-white p-5 shadow-three dark:bg-gray-dark">
-            <form className="mb-5 flex flex-col gap-3 md:flex-row" method="get">
+            <form className="mb-5 flex items-center gap-2" method="get">
               <input
                 type="text"
                 name="q"
@@ -61,16 +61,23 @@ const Blog = async ({ searchParams }: PageProps) => {
               <input type="hidden" name="view" value={view} />
               <button
                 type="submit"
-                className="bg-primary hover:bg-primary/90 rounded-xs px-5 py-3 text-sm font-semibold text-white"
+                aria-label="검색"
+                className="bg-primary hover:bg-primary/90 inline-flex h-[46px] w-[46px] items-center justify-center rounded-xs text-white"
               >
-                검색
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M11 4C14.866 4 18 7.13401 18 11C18 12.7348 17.3694 14.3223 16.3253 15.5452L20.8891 20.1109L19.4749 21.5251L14.9092 16.9613C13.6863 18.0054 12.0988 18.636 10.364 18.636H10.3636C6.49765 18.636 3.36365 15.502 3.36365 11.636C3.36365 7.77001 6.49765 4.63601 10.3636 4.63601H11V4Z"
+                    fill="currentColor"
+                  />
+                </svg>
               </button>
-              <Link
-                href="/blog"
-                className="border-primary/40 text-primary hover:bg-primary/10 rounded-xs border px-5 py-3 text-center text-sm font-semibold"
-              >
-                초기화
-              </Link>
             </form>
 
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -80,23 +87,48 @@ const Blog = async ({ searchParams }: PageProps) => {
                 </span>
                 <Link
                   href={makeFilterHref({ q, tag, view: "grid" })}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  aria-label="박스형 보기"
+                  className={`inline-flex h-9 w-9 items-center justify-center rounded-xs ${
                     view === "grid"
                       ? "bg-primary text-white"
                       : "bg-primary/10 text-primary hover:bg-primary/20"
                   }`}
                 >
-                  박스형
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <rect x="1" y="1" width="5.5" height="5.5" rx="1" fill="currentColor" />
+                    <rect x="9.5" y="1" width="5.5" height="5.5" rx="1" fill="currentColor" />
+                    <rect x="1" y="9.5" width="5.5" height="5.5" rx="1" fill="currentColor" />
+                    <rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1" fill="currentColor" />
+                  </svg>
                 </Link>
                 <Link
                   href={makeFilterHref({ q, tag, view: "list" })}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  aria-label="목록형 보기"
+                  className={`inline-flex h-9 w-9 items-center justify-center rounded-xs ${
                     view === "list"
                       ? "bg-primary text-white"
                       : "bg-primary/10 text-primary hover:bg-primary/20"
                   }`}
                 >
-                  목록형
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <rect x="1" y="2" width="14" height="2.25" rx="1" fill="currentColor" />
+                    <rect x="1" y="6.875" width="14" height="2.25" rx="1" fill="currentColor" />
+                    <rect x="1" y="11.75" width="14" height="2.25" rx="1" fill="currentColor" />
+                  </svg>
                 </Link>
               </div>
             </div>
@@ -146,7 +178,7 @@ const Blog = async ({ searchParams }: PageProps) => {
           <div
             className={
               view === "grid"
-                ? "-mx-4 flex flex-wrap justify-center"
+                ? "-mx-4 flex flex-wrap justify-start"
                 : "space-y-4"
             }
           >

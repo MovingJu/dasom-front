@@ -14,7 +14,7 @@ export type BlogPost = {
   date: string;
   tags: string[];
   author: BlogAuthor;
-  coverImage: string;
+  coverImage?: string;
   content: string;
   html: string;
 };
@@ -23,6 +23,17 @@ type BlogFilter = {
   query?: string;
   tag?: string;
 };
+
+type CodeTokenType =
+  | "plain"
+  | "comment"
+  | "string"
+  | "number"
+  | "keyword"
+  | "type"
+  | "function"
+  | "operator"
+  | "punctuation";
 
 const BLOG_DIR = path.join(process.cwd(), "blog");
 
@@ -33,6 +44,201 @@ const escapeHtml = (value: string) =>
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+
+const KEYWORDS = new Set([
+  "if",
+  "else",
+  "for",
+  "while",
+  "do",
+  "switch",
+  "case",
+  "default",
+  "break",
+  "continue",
+  "return",
+  "try",
+  "catch",
+  "throw",
+  "finally",
+  "new",
+  "delete",
+  "class",
+  "struct",
+  "enum",
+  "namespace",
+  "public",
+  "private",
+  "protected",
+  "static",
+  "const",
+  "constexpr",
+  "let",
+  "var",
+  "fn",
+  "impl",
+  "trait",
+  "match",
+  "use",
+  "mod",
+  "pub",
+  "async",
+  "await",
+  "yield",
+  "typeof",
+  "instanceof",
+  "in",
+  "of",
+  "with",
+  "from",
+  "import",
+  "export",
+]);
+
+const TYPES = new Set([
+  "int",
+  "long",
+  "short",
+  "float",
+  "double",
+  "bool",
+  "char",
+  "void",
+  "string",
+  "usize",
+  "isize",
+  "u8",
+  "u16",
+  "u32",
+  "u64",
+  "i8",
+  "i16",
+  "i32",
+  "i64",
+  "f32",
+  "f64",
+  "String",
+  "Vec",
+  "Option",
+  "Result",
+  "Self",
+  "this",
+  "super",
+  "null",
+  "nullptr",
+  "undefined",
+  "true",
+  "false",
+]);
+
+const tokenClass = (type: CodeTokenType) => {
+  if (type === "plain") return "";
+  return `tok-${type}`;
+};
+
+const readWhile = (input: string, start: number, test: (ch: string) => boolean) => {
+  let i = start;
+  while (i < input.length && test(input[i])) {
+    i += 1;
+  }
+  return i;
+};
+
+const highlightCode = (code: string) => {
+  const chunks: string[] = [];
+  let i = 0;
+
+  while (i < code.length) {
+    const rest = code.slice(i);
+
+    if (rest.startsWith("//")) {
+      const end = code.indexOf("\n", i);
+      const text = end === -1 ? code.slice(i) : code.slice(i, end);
+      chunks.push(`<span class=\"${tokenClass("comment")}\">${escapeHtml(text)}</span>`);
+      i = end === -1 ? code.length : end;
+      continue;
+    }
+
+    if (rest.startsWith("/*")) {
+      const end = code.indexOf("*/", i + 2);
+      const text = end === -1 ? code.slice(i) : code.slice(i, end + 2);
+      chunks.push(`<span class=\"${tokenClass("comment")}\">${escapeHtml(text)}</span>`);
+      i = end === -1 ? code.length : end + 2;
+      continue;
+    }
+
+    if (rest[0] === '"' || rest[0] === "'" || rest[0] === "`") {
+      const quote = rest[0];
+      let j = i + 1;
+      while (j < code.length) {
+        if (code[j] === "\\") {
+          j += 2;
+          continue;
+        }
+        if (code[j] === quote) {
+          j += 1;
+          break;
+        }
+        j += 1;
+      }
+      const text = code.slice(i, j);
+      chunks.push(`<span class=\"${tokenClass("string")}\">${escapeHtml(text)}</span>`);
+      i = j;
+      continue;
+    }
+
+    if (/\s/.test(rest[0])) {
+      const j = readWhile(code, i, (ch) => /\s/.test(ch));
+      chunks.push(escapeHtml(code.slice(i, j)));
+      i = j;
+      continue;
+    }
+
+    if (/\d/.test(rest[0])) {
+      const j = readWhile(code, i, (ch) => /[\d._xXa-fA-F]/.test(ch));
+      chunks.push(`<span class=\"${tokenClass("number")}\">${escapeHtml(code.slice(i, j))}</span>`);
+      i = j;
+      continue;
+    }
+
+    if (/[A-Za-z_]/.test(rest[0])) {
+      const j = readWhile(code, i, (ch) => /[A-Za-z0-9_]/.test(ch));
+      const word = code.slice(i, j);
+      const after = code.slice(j);
+
+      if (KEYWORDS.has(word)) {
+        chunks.push(`<span class=\"${tokenClass("keyword")}\">${escapeHtml(word)}</span>`);
+      } else if (TYPES.has(word)) {
+        chunks.push(`<span class=\"${tokenClass("type")}\">${escapeHtml(word)}</span>`);
+      } else if (/^\s*\(/.test(after)) {
+        chunks.push(`<span class=\"${tokenClass("function")}\">${escapeHtml(word)}</span>`);
+      } else {
+        chunks.push(escapeHtml(word));
+      }
+
+      i = j;
+      continue;
+    }
+
+    if (/[+\-*/%=!<>|&^~?:]/.test(rest[0])) {
+      const j = readWhile(code, i, (ch) => /[+\-*/%=!<>|&^~?:]/.test(ch));
+      chunks.push(`<span class=\"${tokenClass("operator")}\">${escapeHtml(code.slice(i, j))}</span>`);
+      i = j;
+      continue;
+    }
+
+    if (/[()[\]{}.,;]/.test(rest[0])) {
+      chunks.push(`<span class=\"${tokenClass("punctuation")}\">${escapeHtml(rest[0])}</span>`);
+      i += 1;
+      continue;
+    }
+
+    chunks.push(escapeHtml(rest[0]));
+    i += 1;
+  }
+
+  return chunks.join("");
+};
 
 const renderInline = (line: string) => {
   const escaped = escapeHtml(line);
@@ -67,7 +273,7 @@ const markdownToHtml = (markdown: string) => {
     }
 
     if (parts.length > 0) {
-      out.push(`<p class=\"mb-6 text-base leading-relaxed text-body-color sm:text-lg\">${parts.join(" ")}</p>`);
+      out.push(`<p class=\"mb-6 text-base leading-relaxed text-[#2f1d30] dark:text-white/90 sm:text-lg\">${parts.join(" ")}</p>`);
     }
 
     return index;
@@ -91,8 +297,11 @@ const markdownToHtml = (markdown: string) => {
         i += 1;
       }
       i += 1;
+      const language = (lang || "text").toLowerCase();
+      const languageLabel = language === "cpp" ? "C++" : language.toUpperCase();
+      const highlighted = highlightCode(codeLines.join("\n"));
       out.push(
-        `<pre class=\"mb-8 overflow-x-auto rounded-md bg-[#1d1d1d] p-4 text-sm text-[#e7e7e7]\"><code class=\"language-${escapeHtml(lang || "text")}\">${escapeHtml(codeLines.join("\n"))}</code></pre>`,
+        `<div class=\"blog-code-wrap mb-8 overflow-hidden rounded-md\"><div class=\"blog-code-toolbar\"><span class=\"blog-code-lang\">${escapeHtml(languageLabel)}</span><button type=\"button\" class=\"blog-copy-btn\">복사</button></div><pre class=\"blog-code overflow-x-auto p-4 text-sm\"><code class=\"language-${escapeHtml(language)}\">${highlighted}</code></pre></div>`,
       );
       continue;
     }
@@ -117,7 +326,7 @@ const markdownToHtml = (markdown: string) => {
     }
 
     if (line.startsWith("> ")) {
-      out.push(`<blockquote class=\"mb-8 border-l-4 border-primary bg-primary/10 p-4 text-body-color italic\">${renderInline(line.slice(2))}</blockquote>`);
+      out.push(`<blockquote class=\"mb-8 border-l-4 border-primary bg-primary/10 p-4 text-[#2f1d30] italic dark:text-white/90\">${renderInline(line.slice(2))}</blockquote>`);
       i += 1;
       continue;
     }
@@ -129,7 +338,7 @@ const markdownToHtml = (markdown: string) => {
         items.push(`<li>${renderInline(lines[index].trim().slice(2))}</li>`);
         index += 1;
       }
-      out.push(`<ul class=\"mb-8 list-inside list-disc space-y-2 text-body-color\">${items.join("")}</ul>`);
+      out.push(`<ul class=\"mb-8 list-inside list-disc space-y-2 text-[#2f1d30] dark:text-white/90\">${items.join("")}</ul>`);
       i = index;
       continue;
     }
@@ -141,7 +350,7 @@ const markdownToHtml = (markdown: string) => {
         items.push(`<li>${renderInline(lines[index].trim().replace(/^\d+\.\s/, ""))}</li>`);
         index += 1;
       }
-      out.push(`<ol class=\"mb-8 list-inside list-decimal space-y-2 text-body-color\">${items.join("")}</ol>`);
+      out.push(`<ol class=\"mb-8 list-inside list-decimal space-y-2 text-[#2f1d30] dark:text-white/90\">${items.join("")}</ol>`);
       i = index;
       continue;
     }
@@ -178,6 +387,7 @@ const parseFrontmatter = (raw: string) => {
 };
 
 const slugFromFileName = (fileName: string) => fileName.replace(/\.md$/, "");
+const nonEmpty = (value?: string) => (value?.trim() ? value.trim() : undefined);
 
 const normalizePost = (slug: string, meta: Record<string, string>, content: string): BlogPost => {
   const title = meta.title || slug;
@@ -195,11 +405,11 @@ const normalizePost = (slug: string, meta: Record<string, string>, content: stri
     date,
     tags,
     author: {
-      name: meta.authorName || "다솜 운영진",
-      image: meta.authorImage || "/images/blog/author-03.png",
-      designation: meta.authorDesignation || "운영팀",
+      name: nonEmpty(meta.authorName) || "다솜 운영진",
+      image: nonEmpty(meta.authorImage) || "/images/blog/author-default.png",
+      designation: nonEmpty(meta.authorDesignation) || "운영팀",
     },
-    coverImage: meta.coverImage || "/images/blog/blog-01.jpg",
+    coverImage: nonEmpty(meta.coverImage),
     content,
     html: markdownToHtml(content),
   };

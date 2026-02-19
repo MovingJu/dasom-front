@@ -10,7 +10,6 @@ const toCardModel = (blog: BlogCard) => {
     return {
       href: `/blog/${blog.slug}`,
       title: blog.title,
-      paragraph: blog.excerpt,
       author: blog.author,
       tags: blog.tags,
       publishDate: blog.date,
@@ -20,7 +19,6 @@ const toCardModel = (blog: BlogCard) => {
   return {
     href: "/blog-details",
     title: blog.title,
-    paragraph: blog.paragraph,
     author: blog.author,
     tags: blog.tags,
     publishDate: blog.publishDate,
@@ -36,6 +34,8 @@ const SingleBlog = ({
 }) => {
   const { href, title, author, tags, publishDate } = toCardModel(blog);
   const isList = view === "list";
+  const authorImage =
+    author.image?.trim() || "/images/blog/author-default.png";
 
   return (
     <div
@@ -86,7 +86,7 @@ const SingleBlog = ({
                   isList ? "h-8 w-8" : "h-10 w-10"
                 }`}
               >
-                <Image src={author.image} alt={author.name} fill />
+                <Image src={authorImage} alt={author.name} fill />
               </div>
             </div>
             <div className="w-full">

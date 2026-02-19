@@ -2,6 +2,7 @@ import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/blog";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import BlogContent from "@/components/Blog/BlogContent";
 import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
@@ -37,6 +38,9 @@ const BlogDetailPage = async ({ params }: PageProps) => {
   if (!post) {
     notFound();
   }
+  const authorImage =
+    post.author.image?.trim() || "/images/blog/author-default.png";
+  const coverImage = post.coverImage?.trim();
 
   return (
     <section className="pb-[120px] pt-[150px]">
@@ -51,7 +55,7 @@ const BlogDetailPage = async ({ params }: PageProps) => {
               <div className="mb-5 mr-10 flex items-center">
                 <div className="mr-4">
                   <div className="relative h-10 w-10 overflow-hidden rounded-full">
-                    <Image src={post.author.image} alt={post.author.name} fill />
+                    <Image src={authorImage} alt={post.author.name} fill />
                   </div>
                 </div>
                 <div>
@@ -65,18 +69,20 @@ const BlogDetailPage = async ({ params }: PageProps) => {
               <div className="mb-5 text-sm text-body-color">{post.date}</div>
             </div>
 
-            <div className="mb-10 w-full overflow-hidden rounded-sm">
-              <div className="relative aspect-97/44 w-full">
-                <Image
-                  src={post.coverImage}
-                  alt={post.title}
-                  fill
-                  className="object-cover object-center"
-                />
+            {coverImage ? (
+              <div className="mb-10 w-full overflow-hidden rounded-sm">
+                <div className="relative aspect-97/44 w-full">
+                  <Image
+                    src={coverImage}
+                    alt={post.title}
+                    fill
+                    className="object-cover object-center"
+                  />
+                </div>
               </div>
-            </div>
+            ) : null}
 
-            <div dangerouslySetInnerHTML={{ __html: post.html }} />
+            <BlogContent html={post.html} />
 
             {post.tags.length > 0 ? (
               <div className="mt-10 border-t border-body-color/10 pt-6 dark:border-white/10">

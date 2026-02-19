@@ -4,7 +4,7 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="relative z-10 min-h-[92vh] overflow-hidden bg-cover bg-center bg-no-repeat pb-24 pt-[160px] md:bg-fixed md:pb-[160px] md:pt-[190px] xl:pb-[190px] xl:pt-[220px] 2xl:pb-[220px] 2xl:pt-[240px]"
+      className="relative z-10 min-h-[100vh] overflow-hidden bg-cover bg-center bg-no-repeat pb-28 pt-[180px] md:bg-fixed md:pb-[190px] md:pt-[220px] xl:pb-[220px] xl:pt-[250px] 2xl:pb-[250px] 2xl:pt-[280px]"
       style={{ backgroundImage: "url('/images/hero/dasom_sul_danche.webp')" }}
     >
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/55" />
