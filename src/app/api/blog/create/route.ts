@@ -8,7 +8,6 @@ export const runtime = "nodejs";
 type CreateBlogBody = {
   title?: string;
   tags?: string;
-  coverImage?: string;
   content?: string;
 };
 
@@ -81,7 +80,6 @@ export async function POST(request: Request) {
   const slug = await resolveUniqueSlug(baseSlug);
 
   const tags = cleanLine(body.tags ?? "");
-  const coverImage = cleanLine(body.coverImage ?? "");
   const date = new Date().toISOString().slice(0, 10);
 
   const frontmatterLines = [
@@ -92,10 +90,6 @@ export async function POST(request: Request) {
     `authorName: ${cleanLine(user.name) || "다솜 운영진"}`,
     `authorDesignation: ${cleanLine(user.role) || "운영팀"}`,
   ];
-
-  if (coverImage) {
-    frontmatterLines.push(`coverImage: ${coverImage}`);
-  }
 
   frontmatterLines.push("---", "");
 

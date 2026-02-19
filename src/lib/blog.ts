@@ -14,7 +14,6 @@ export type BlogPost = {
   date: string;
   tags: string[];
   author: BlogAuthor;
-  coverImage?: string;
   content: string;
   html: string;
 };
@@ -306,6 +305,16 @@ const markdownToHtml = (markdown: string) => {
       continue;
     }
 
+    const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imageMatch) {
+      const [, alt, src] = imageMatch;
+      out.push(
+        `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" class="mb-8 w-full rounded-md border border-body-color/10 dark:border-white/10" loading="lazy" />`,
+      );
+      i += 1;
+      continue;
+    }
+
     const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
     if (headingMatch) {
       const level = headingMatch[1].length;
@@ -409,7 +418,6 @@ const normalizePost = (slug: string, meta: Record<string, string>, content: stri
       image: nonEmpty(meta.authorImage) || "/images/blog/author-default.png",
       designation: nonEmpty(meta.authorDesignation) || "운영팀",
     },
-    coverImage: nonEmpty(meta.coverImage),
     content,
     html: markdownToHtml(content),
   };

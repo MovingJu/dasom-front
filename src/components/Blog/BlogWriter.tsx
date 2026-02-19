@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 type CreateResult = {
   ok?: boolean;
@@ -12,13 +12,21 @@ type CreateResult = {
   error?: string;
 };
 
+type UploadResult = {
+  ok?: boolean;
+  url?: string;
+  error?: string;
+};
+
 const BlogWriter = () => {
   const router = useRouter();
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState("");
-  const [coverImage, setCoverImage] = useState("");
   const [content, setContent] = useState("# 새 글 제목\n\n본문을 작성하세요.");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
   const [result, setResult] = useState<CreateResult | null>(null);
 
   const canSubmit = useMemo(
@@ -42,7 +50,6 @@ const BlogWriter = () => {
         body: JSON.stringify({
           title,
           tags,
-          coverImage,
           content,
         }),
       });
@@ -63,6 +70,60 @@ const BlogWriter = () => {
       setResult({ error: message });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const insertAtCursor = (text: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      setContent((prev) => `${prev}\n${text}`);
+      return;
+    }
+
+    const start = textarea.selectionStart ?? content.length;
+    const end = textarea.selectionEnd ?? content.length;
+    const next = `${content.slice(0, start)}${text}${content.slice(end)}`;
+    setContent(next);
+
+    const cursor = start + text.length;
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(cursor, cursor);
+    });
+  };
+
+  const onImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadMessage(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/blog/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = (await response.json()) as UploadResult;
+
+      if (!response.ok || !data.ok || !data.url) {
+        setUploadMessage(data.error || "이미지 업로드에 실패했습니다.");
+        return;
+      }
+
+      const alt = file.name.replace(/\.[^.]+$/, "") || "image";
+      const markdown = `\n![${alt}](${data.url})\n`;
+      insertAtCursor(markdown);
+      setUploadMessage("이미지 업로드 완료");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "알 수 없는 오류";
+      setUploadMessage(message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -93,28 +154,38 @@ const BlogWriter = () => {
               placeholder="태그 (쉼표 구분)"
               className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
             />
-            <input
-              value={coverImage}
-              onChange={(e) => setCoverImage(e.target.value)}
-              placeholder="커버 이미지 경로 (선택)"
-              className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
-            />
           </div>
 
           <textarea
+            ref={textareaRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="border-body-color/20 focus:border-primary h-[420px] w-full rounded-xs border bg-[#f8f8f8] p-4 font-mono text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
             spellCheck={false}
           />
 
-          <button
-            type="submit"
-            disabled={!canSubmit || isSubmitting}
-            className="bg-primary hover:bg-primary/90 rounded-xs px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-primary/60"
-          >
-            {isSubmitting ? "작성 중..." : "마크다운 글 저장"}
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer rounded-xs px-5 py-3 text-sm font-semibold">
+              {isUploading ? "업로드 중..." : "이미지 업로드"}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                className="hidden"
+                disabled={isUploading}
+                onChange={onImageUpload}
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={!canSubmit || isSubmitting}
+              className="bg-primary hover:bg-primary/90 rounded-xs px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-primary/60"
+            >
+              {isSubmitting ? "작성 중..." : "마크다운 글 저장"}
+            </button>
+            {uploadMessage ? (
+              <span className="text-sm text-body-color dark:text-white/80">{uploadMessage}</span>
+            ) : null}
+          </div>
 
           {result ? (
             <div className="rounded-xs border border-primary/25 bg-primary/10 p-4 text-sm text-dark dark:text-white">

@@ -12,6 +12,7 @@ type SignupResponse = {
 const SignupForm = () => {
   const router = useRouter();
   const [name, setName] = useState("");
+  const [studentId, setStudentId] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,7 +27,7 @@ const SignupForm = () => {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, studentId, email, password }),
       });
 
       const data = (await response.json()) as SignupResponse;
@@ -69,6 +70,20 @@ const SignupForm = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="홍길동"
+                    className="border-stroke text-body-color focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#332d31] dark:text-body-color-dark"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="studentId" className="text-dark mb-2 block text-sm dark:text-white">
+                    학번
+                  </label>
+                  <input
+                    id="studentId"
+                    type="text"
+                    inputMode="numeric"
+                    value={studentId}
+                    onChange={(e) => setStudentId(e.target.value)}
+                    placeholder="10자리 숫자 학번"
                     className="border-stroke text-body-color focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#332d31] dark:text-body-color-dark"
                   />
                 </div>
