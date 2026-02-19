@@ -5,6 +5,7 @@ type SignupBody = {
   email?: string;
   password?: string;
   name?: string;
+  studentId?: string;
 };
 
 export async function POST(request: Request) {
@@ -13,12 +14,15 @@ export async function POST(request: Request) {
     email: body.email ?? "",
     password: body.password ?? "",
     name: body.name ?? "",
+    studentId: body.studentId ?? "",
   });
 
   if (!result.ok) {
     const messageByReason = {
-      MISSING_FIELDS: "이름, 이메일, 비밀번호를 모두 입력해 주세요.",
+      MISSING_FIELDS: "이름, 학번, 이메일, 비밀번호를 모두 입력해 주세요.",
       INVALID_EMAIL_DOMAIN: "회원가입은 @khu.ac.kr 이메일만 가능합니다.",
+      INVALID_STUDENT_ID_FORMAT: "학번은 10자리 숫자로 입력해 주세요.",
+      FRESHMAN_NOT_SUPPORTED: "2026 신입생은 아직 지원되지 않습니다.",
       INVALID_CHARACTERS: "입력값에 사용할 수 없는 문자가 포함되어 있습니다.",
       EMAIL_EXISTS: "이미 가입된 이메일입니다.",
     } as const;

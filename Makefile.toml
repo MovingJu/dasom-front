@@ -7,9 +7,9 @@ dependencies = ["docker-build", "docker-push"]
 
 [tasks.docker-build]
 command = "docker"
-args = ["buildx", "build", "--platform=linux/amd64", "-t", "movingju/public:dasom_front", "."]
+args = ["buildx", "build", "--platform=linux/amd64", "-t", "movingju/test:dasom_front", "."]
 
 [tasks.docker-push]
 command = "docker"
-args = ["push", "movingju/public:dasom_front"]
+args = ["push", "movingju/test:dasom_front"]
 

@@ -8,11 +8,10 @@ export const runtime = "nodejs";
 type CreateBlogBody = {
   title?: string;
   tags?: string;
-  coverImage?: string;
   content?: string;
 };
 
-const BLOG_DIR = path.join(process.cwd(), "blog");
+const BLOG_DIR = path.join(process.cwd(), "uploads", "blog-posts");
 
 const cleanLine = (value: string) => value.replace(/\r?\n/g, " ").trim();
 
@@ -81,7 +80,6 @@ export async function POST(request: Request) {
   const slug = await resolveUniqueSlug(baseSlug);
 
   const tags = cleanLine(body.tags ?? "");
-  const coverImage = cleanLine(body.coverImage ?? "");
   const date = new Date().toISOString().slice(0, 10);
 
   const frontmatterLines = [
@@ -92,10 +90,6 @@ export async function POST(request: Request) {
     `authorName: ${cleanLine(user.name) || "다솜 운영진"}`,
     `authorDesignation: ${cleanLine(user.role) || "운영팀"}`,
   ];
-
-  if (coverImage) {
-    frontmatterLines.push(`coverImage: ${coverImage}`);
-  }
 
   frontmatterLines.push("---", "");
 
@@ -110,7 +104,7 @@ export async function POST(request: Request) {
     ok: true,
     slug,
     fileName,
-    path: `blog/${fileName}`,
+    path: `uploads/blog-posts/${fileName}`,
     detailUrl: `/blog/${slug}`,
   });
 }

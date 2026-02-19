@@ -35,22 +35,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const BlogDetailPage = async ({ params }: PageProps) => {
   const { slug } = await params;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("dasom_session")?.value;
-  const user = decodeSessionToken(token);
-
-  if (!user) {
-    redirect(`/signin?next=${encodeURIComponent(`/blog/${slug}`)}`);
-  }
-
   const post = await getBlogPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
+
+  const isNoticePost = post.tags.some((tag) => tag.trim() === "공지");
+  const cookieStore = await cookies();
+  const token = cookieStore.get("dasom_session")?.value;
+  const user = decodeSessionToken(token);
+
+  if (!user && !isNoticePost) {
+    redirect(`/signin?next=${encodeURIComponent(`/blog/${slug}`)}`);
+  }
   const authorImage =
     post.author.image?.trim() || "/images/blog/author-default.png";
-  const coverImage = post.coverImage?.trim();
 
   return (
     <section className="pb-[120px] pt-[150px]">
@@ -78,20 +78,6 @@ const BlogDetailPage = async ({ params }: PageProps) => {
 
               <div className="mb-5 text-sm text-body-color">{post.date}</div>
             </div>
-
-            {coverImage ? (
-              <div className="mb-10 w-full overflow-hidden rounded-sm">
-                <div className="relative aspect-97/44 w-full">
-                  <Image
-                    src={coverImage}
-                    alt={post.title}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 900px"
-                    className="object-cover object-center"
-                  />
-                </div>
-              </div>
-            ) : null}
 
             <BlogContent html={post.html} />
 

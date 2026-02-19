@@ -14,10 +14,9 @@ const ContactPage = () => {
     <>
       <Breadcrumb
         pageName="Contact Page"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. In varius eros eget sapien consectetur ultrices. Ut quis dapibus libero."
+        description="궁금한 점은 여기로 보내주세요!"
       />
-
-      <Contact />
+      <Contact compactTop />
     </>
   );
 };

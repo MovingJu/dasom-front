@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const isProtectedPath = (pathname: string) =>
-  pathname.startsWith("/blog") ||
+  pathname.startsWith("/blog/write") ||
   pathname.startsWith("/zokbo") ||
   pathname.startsWith("/blog-sidebar");
 
@@ -53,5 +53,5 @@ const isValidSessionToken = (token?: string) => {
 };
 
 export const config = {
-  matcher: ["/blog/:path*", "/zokbo/:path*", "/blog-sidebar/:path*"],
+  matcher: ["/blog/write", "/zokbo/:path*", "/blog-sidebar/:path*"],
 };

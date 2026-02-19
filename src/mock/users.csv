@@ -1,5 +1,4 @@
-id,email,password,name,role,active
-1,admin@dasom.dev,dasom123!,다솜관리자,admin,true
-2,member@dasom.dev,member123!,홍길동,member,true
-3,inactive@dasom.dev,inactive123!,휴면유저,member,false
-4,test@khu.ac.kr,test,테스트,member,true
+id,email,password,name,role,active,studentId
+1,admin@khu.ac.kr,dasomDASOM,관리자,admin,true,2025000001
+2,test@khu.ac.kr,test,테스트,member,true,2024000002
+3,movingju06@khu.ac.kr,dlehdwn0425,사이트제작,member,true,2023000003

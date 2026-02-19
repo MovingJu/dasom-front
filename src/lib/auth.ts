@@ -6,6 +6,7 @@ export type MockUser = {
   email: string;
   password: string;
   name: string;
+  studentId: string;
   role: string;
   active: boolean;
 };
@@ -14,6 +15,7 @@ export type SessionUser = {
   id: string;
   email: string;
   name: string;
+  studentId: string;
   role: string;
 };
 
@@ -35,12 +37,15 @@ export const getMockUsers = async (): Promise<MockUser[]> => {
 
   const [, ...rows] = lines;
   return rows.map((row) => {
-    const [id, email, password, name, role, active] = parseCsvLine(row);
+    const columns = parseCsvLine(row);
+    const [id, email, password, name, role, active] = columns;
+    const studentId = columns[6] ?? "";
     return {
       id,
       email: email.toLowerCase(),
       password,
       name,
+      studentId,
       role,
       active: active === "true",
     };
@@ -67,6 +72,7 @@ export const verifyLogin = async (email: string, password: string) => {
     id: target.id,
     email: target.email,
     name: target.name,
+    studentId: target.studentId,
     role: target.role,
   };
 
@@ -81,12 +87,14 @@ export const registerMockUser = async (input: {
   email: string;
   password: string;
   name: string;
+  studentId: string;
 }) => {
   const email = input.email.trim().toLowerCase();
   const password = input.password.trim();
   const name = input.name.trim();
+  const studentId = input.studentId.trim();
 
-  if (!email || !password || !name) {
+  if (!email || !password || !name || !studentId) {
     return { ok: false as const, reason: "MISSING_FIELDS" as const };
   }
 
@@ -94,7 +102,20 @@ export const registerMockUser = async (input: {
     return { ok: false as const, reason: "INVALID_EMAIL_DOMAIN" as const };
   }
 
-  if (hasForbiddenCsvCharacter(email) || hasForbiddenCsvCharacter(password) || hasForbiddenCsvCharacter(name)) {
+  if (!/^\d{10}$/.test(studentId)) {
+    return { ok: false as const, reason: "INVALID_STUDENT_ID_FORMAT" as const };
+  }
+
+  if (studentId.startsWith("2026")) {
+    return { ok: false as const, reason: "FRESHMAN_NOT_SUPPORTED" as const };
+  }
+
+  if (
+    hasForbiddenCsvCharacter(email) ||
+    hasForbiddenCsvCharacter(password) ||
+    hasForbiddenCsvCharacter(name) ||
+    hasForbiddenCsvCharacter(studentId)
+  ) {
     return { ok: false as const, reason: "INVALID_CHARACTERS" as const };
   }
 
@@ -110,12 +131,16 @@ export const registerMockUser = async (input: {
   }, 0);
   const nextId = String(maxId + 1);
 
-  await fs.appendFile(USERS_CSV_PATH, `\n${nextId},${email},${password},${name},member,true`);
+  await fs.appendFile(
+    USERS_CSV_PATH,
+    `\n${nextId},${email},${password},${name},member,true,${studentId}`,
+  );
 
   const sessionUser: SessionUser = {
     id: nextId,
     email,
     name,
+    studentId,
     role: "member",
   };
 
@@ -138,7 +163,10 @@ export const decodeSessionToken = (token?: string): SessionUser | null => {
       return null;
     }
 
-    return parsed;
+    return {
+      ...parsed,
+      studentId: parsed.studentId ?? "",
+    };
   } catch {
     return null;
   }

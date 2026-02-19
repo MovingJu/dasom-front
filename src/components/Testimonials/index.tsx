@@ -8,7 +8,7 @@ const testimonialData: Testimonial[] = [
     designation: "회장",
     content:
       "안녕 새내기, 똥먹을래?",
-    image: "/images/testimonials/auth-02.png",
+    image: "/images/blog/author-default.png",
   },
   {
     id: 2,
@@ -16,7 +16,7 @@ const testimonialData: Testimonial[] = [
     designation: "부회장",
     content:
       "삼전 13층에 사람있어요",
-    image: "/images/testimonials/auth-01.png",
+    image: "/images/blog/author-default.png",
   },
   {
     id: 3,
@@ -24,7 +24,7 @@ const testimonialData: Testimonial[] = [
     designation: "총무",
     content:
       "나 술 잘먹냐고? 아니 별로.",
-    image: "/images/testimonials/auth-03.png",
+    image: "/images/blog/author-default.png",
   },
   {
     id: 4,
@@ -32,7 +32,7 @@ const testimonialData: Testimonial[] = [
     designation: "교육부장",
     content:
       "어, 뭐야? 너 객프 이대호 교수님 들어?? 와 그분 듣는 애는 귀한데.. 내가 컴퓨터공학과 커리큘럼 알려줄까...(생략)",
-    image: "/images/testimonials/auth-03.png",
+    image: "/images/blog/author-default.png",
   },
   {
     id: 5,
@@ -40,7 +40,7 @@ const testimonialData: Testimonial[] = [
     designation: "교육부장",
     content:
       "반갑습니다. 최고의 웹파만점전략가 한상연입니다.",
-    image: "/images/testimonials/auth-03.png",
+    image: "/images/blog/author-default.png",
   },
 ];
 
