@@ -1,7 +1,10 @@
 import Breadcrumb from "@/components/Common/Breadcrumb";
+import { decodeSessionToken } from "@/lib/auth";
 import zokboData from "@/components/Zokbo/zokboData";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "zokbo-sidebar | DASOM",
@@ -13,6 +16,14 @@ type PageProps = {
 };
 
 const BlogSidebarPage = async ({ searchParams }: PageProps) => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("dasom_session")?.value;
+  const user = decodeSessionToken(token);
+
+  if (!user) {
+    redirect("/signin?next=%2Fblog-sidebar");
+  }
+
   const params = await searchParams;
   const selectedId = Number(params.id ?? zokboData[0]?.id ?? 1);
   const selected =
@@ -31,7 +42,7 @@ const BlogSidebarPage = async ({ searchParams }: PageProps) => {
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4 lg:w-8/12">
-              <div className="shadow-three dark:bg-gray-dark rounded-xs bg-white p-6 sm:p-8">
+              <div className="shadow-three rounded-xs bg-white p-6 dark:bg-[#3a3338] sm:p-8">
                 <h1 className="mb-4 text-3xl leading-tight font-bold text-black sm:text-4xl dark:text-white">
                   {selected.title}
                 </h1>
@@ -75,7 +86,7 @@ const BlogSidebarPage = async ({ searchParams }: PageProps) => {
 
             <div className="w-full px-4 lg:w-4/12">
               <div className="mt-12 space-y-8 lg:mt-0">
-                <div className="shadow-three dark:bg-gray-dark rounded-xs bg-white p-6">
+                <div className="shadow-three rounded-xs bg-white p-6 dark:bg-[#3a3338]">
                   <h3 className="mb-5 text-xl font-bold text-black dark:text-white">
                     관련 족보
                   </h3>
@@ -97,7 +108,7 @@ const BlogSidebarPage = async ({ searchParams }: PageProps) => {
                   </ul>
                 </div>
 
-                <div className="shadow-three dark:bg-gray-dark rounded-xs bg-white p-6">
+                <div className="shadow-three rounded-xs bg-white p-6 dark:bg-[#3a3338]">
                   <h3 className="mb-5 text-xl font-bold text-black dark:text-white">
                     Popular Tags
                   </h3>
