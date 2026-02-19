@@ -1,69 +1,61 @@
 "use client";
 
-import VideoModal from "@/components/video-modal";
-import Image from "next/image";
-import { useState } from "react";
-import SectionTitle from "../Common/SectionTitle";
+import { useEffect, useRef, useState } from "react";
 
 export default function Video() {
-  const [isOpen, setOpen] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const [isSwitched, setIsSwitched] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (!titleRef.current) {
+        return;
+      }
+
+      const rect = titleRef.current.getBoundingClientRect();
+      const viewportCenter = window.innerHeight / 2;
+      const titleCenter = rect.top + rect.height / 2;
+
+      setIsSwitched(titleCenter <= viewportCenter);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   return (
-    <>
-      <section className="relative z-10 bg-[#f8f2f6] py-16 dark:bg-[#272326] md:py-20 lg:py-28">
-        <div className="container">
-          <SectionTitle
-            title="다솜이란?"
-            paragraph="동영상으로 보는 다솜 어쩌구저쩌구 분량 채워야 글 보이나?? 그렇네 여기 적을게 너무 없습니다 살려주세요"
-            center
-            mb="80px"
-          />
-        </div>
-        <div className="relative overflow-hidden">
-          <div className="-mx-4 flex flex-wrap">
-            <div className="w-full px-4">
-              <div className="mx-auto max-w-[770px] overflow-hidden rounded-md">
-                <div className="relative aspect-77/40 items-center justify-center">
-                  <Image
-                    src="/images/video/image.png"
-                    alt="video image"
-                    className="object-cover"
-                    fill
-                  />
-                  <div className="absolute top-0 right-0 flex h-full w-full items-center justify-center">
-                    <button
-                      aria-label="video play button"
-                      onClick={() => setOpen(true)}
-                      className="text-primary flex h-[70px] w-[70px] items-center justify-center rounded-full bg-white/75 transition hover:bg-white cursor-pointer"
-                    >
-                      <svg
-                        width="16"
-                        height="18"
-                        viewBox="0 0 16 18"
-                        className="fill-current"
-                      >
-                        <path d="M15.5 8.13397C16.1667 8.51888 16.1667 9.48112 15.5 9.86602L2 17.6603C1.33333 18.0452 0.499999 17.564 0.499999 16.7942L0.5 1.20577C0.5 0.43597 1.33333 -0.0451549 2 0.339745L15.5 8.13397Z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute right-0 bottom-0 left-0 z-[-1] h-full w-full bg-[url(/images/video/shape.svg)] bg-cover bg-center bg-no-repeat">
-            {/* <div className="absolute bottom-0 left-0 right-0 z-[-1] "> */}
-            <img src="/images/video/shape.png" alt="shape" className="w-full" />
-          </div>
-        </div>
-      </section>
-
-      <VideoModal
-        isOpen={isOpen}
-        onClose={() => setOpen(false)}
-        channel="youtube"
-        videoId="L61p2uyiMSo"
+    <section className="relative flex min-h-[42vh] items-center overflow-hidden py-12 md:min-h-[50vh] md:py-16 lg:min-h-[56vh]">
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat md:bg-fixed"
+        style={{ backgroundImage: "url('/images/hero/dasom_sul_danche.webp')" }}
       />
-    </>
+
+      <div
+        className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 md:bg-fixed ${isSwitched ? "opacity-100" : "opacity-0"}`}
+        style={{ backgroundImage: "url('/images/hero/dasom_danche.webp')" }}
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/60" />
+
+      <div className="container relative z-10">
+        <div className="mx-auto max-w-3xl text-center text-white">
+          <p className="text-primary mb-4 text-sm font-semibold tracking-[0.2em] uppercase">
+            DASOM MOMENT
+          </p>
+          <h2 ref={titleRef} className="mb-6 text-3xl leading-tight font-bold sm:text-4xl md:text-5xl">
+            함께 성장해 온 다솜의 시간
+          </h2>
+          <p className="mx-auto max-w-2xl text-base leading-relaxed text-white/90 md:text-lg">
+            스크롤 위로 올라가도 이 장면은 그대로 남아, 다솜이 함께 만든 기록을 계속 보여줍니다.
+          </p>
+        </div>
+      </div>
+    </section>
   );
-};
+}

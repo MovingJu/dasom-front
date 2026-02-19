@@ -24,7 +24,8 @@ const Header = () => {
   };
   useEffect(() => {
     window.addEventListener("scroll", handleStickyNavbar);
-  });
+    return () => window.removeEventListener("scroll", handleStickyNavbar);
+  }, []);
 
   // submenu handler
   const [openIndex, setOpenIndex] = useState(-1);
@@ -44,7 +45,7 @@ const Header = () => {
         className={`header top-0 left-0 z-40 flex w-full items-center ${
           sticky
             ? "dark:bg-gray-dark dark:shadow-sticky-dark shadow-sticky fixed z-9999 bg-[#f2edf1]/80 backdrop-blur-xs transition"
-            : "absolute bg-transparent"
+            : "fixed z-9999 bg-[#f2edf1]/95 shadow-sticky backdrop-blur-xs dark:bg-gray-dark/95"
         }`}
       >
         <div className="container">
@@ -52,9 +53,7 @@ const Header = () => {
             <div className="w-60 max-w-full px-4 xl:mr-12">
               <Link
                 href="/"
-                className={`header-logo block w-full ${
-                  sticky ? "py-5 lg:py-2" : "py-8"
-                } `}
+                className="header-logo block w-full py-5 lg:py-2"
               >
                 <Image
                   src="/images/logo/logo-white.png"

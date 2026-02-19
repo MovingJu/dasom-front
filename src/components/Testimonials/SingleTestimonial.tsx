@@ -11,8 +11,8 @@ const SingleTestimonial = ({ testimonial }: { testimonial: Testimonial }) => {
 
   return (
     <div className="w-full">
-      <div className="shadow-two hover:shadow-one dark:bg-dark dark:shadow-three dark:hover:shadow-gray-dark rounded-xs bg-white p-8 duration-300 lg:px-5 xl:px-8">
-        <p className="border-body-color/10 text-body-color mb-8 border-b pb-8 text-base leading-relaxed dark:border-white/10 dark:text-white">
+      <div className="wow fadeInUp flex h-full flex-col rounded-2xl border border-white/30 bg-black/25 p-8 shadow-lg backdrop-blur-md duration-300 lg:px-5 xl:px-8">
+        <p className="mb-8 border-b border-white/20 pb-8 text-base leading-relaxed text-white/90">
           “{content}
         </p>
         <div className="flex items-center">
@@ -20,10 +20,10 @@ const SingleTestimonial = ({ testimonial }: { testimonial: Testimonial }) => {
             <Image src={image} alt={name} fill />
           </div>
           <div className="w-full">
-            <h3 className="text-dark mb-1 text-lg font-semibold lg:text-base xl:text-lg dark:text-white">
+            <h3 className="mb-1 text-lg font-semibold text-white lg:text-base xl:text-lg">
               {name}
             </h3>
-            <p className="text-body-color text-sm">{designation}</p>
+            <p className="text-sm text-white/80">{designation}</p>
           </div>
         </div>
       </div>

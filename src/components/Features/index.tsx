@@ -1,30 +1,35 @@
-import SectionTitle from "../Common/SectionTitle";
-import SingleFeature from "./SingleFeature";
-import featuresData from "./featuresData";
+import { getMainPageData } from "@/lib/mainPage";
 
-const Features = () => {
-  return (
-    <>
-      <section
-        id="features"
-        className="bg-white py-16 dark:bg-[#222222] md:py-20 lg:py-28"
-      >
-        <div className="container">
-          <SectionTitle
-            title="숫자로 보는 다솜"
-            paragraph="'Talk is cheap, Show me the code' - Linus Torvalds"
-            center
-          />
+import FeaturesSectionClient from "./FeaturesSectionClient";
 
-          <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3">
-            {featuresData.map((feature) => (
-              <SingleFeature key={feature.id} feature={feature} />
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
-  );
+const formatStatValue = (key: string, value: number): string => {
+  const formatted = value.toLocaleString("ko-KR");
+
+  if (key.includes("부원")) return `${formatted}명`;
+  if (key.includes("프로젝트")) return `${formatted}개`;
+  if (key.includes("세미나")) return `${formatted}회`;
+  if (key.includes("연혁") || key.includes("년")) return `${formatted}년`;
+
+  return formatted;
+};
+
+const formatStatLabel = (key: string): string => {
+  if (key.includes("부원")) return "현재 활발히 활동 중인 다솜 부원 수";
+  if (key.includes("프로젝트")) return "지금까지 진행한 팀/개인 프로젝트 누적";
+  if (key.includes("세미나")) return "한 학기 동안 운영되는 정기 세미나";
+  if (key.includes("연혁") || key.includes("년")) return "다솜이 이어온 시간과 성장의 기록";
+
+  return key;
+};
+
+const Features = async () => {
+  const mainPage = await getMainPageData();
+  const stats = mainPage.about_us_num.map((item) => ({
+    key: formatStatLabel(item.key),
+    valueText: formatStatValue(item.key, item.value),
+  }));
+
+  return <FeaturesSectionClient stats={stats} />;
 };
 
 export default Features;

@@ -1,0 +1,60 @@
+{
+  "status": 200,
+  "message": "success",
+  "data": {
+    "title": "DASOM Computer Club",
+    "main": {
+      "title": "Welcome to DASOM",
+      "subtitle": "Build, Learn, Share Together"
+    },
+    "about_us": [
+      {
+        "title": "Who We Are",
+        "content": "DASOM is a university computer club focused on software engineering and collaboration."
+      },
+      {
+        "title": "What We Do",
+        "content": "We run weekly study sessions, project groups, and technical seminars."
+      },
+      {
+        "title": "Our Goal",
+        "content": "We help members grow through practical development experience and teamwork."
+      }
+    ],
+    "about_us_num": [
+      {
+        "key": "활동 부원",
+        "value": 120
+      },
+      {
+        "key": "누적 프로젝트",
+        "value": 36
+      },
+      {
+        "key": "학기 세미나",
+        "value": 18
+      },
+      {
+        "key": "동아리 연혁(년)",
+        "value": 24
+      }
+    ],
+    "bosses": [
+      {
+        "year": 2026,
+        "name": "김민수",
+        "phone": "010-1234-5678"
+      },
+      {
+        "year": 2026,
+        "name": "이지연",
+        "phone": "010-8765-4321"
+      }
+    ],
+    "images": [
+      "https://images.example.com/dasom/main-01.jpg",
+      "https://images.example.com/dasom/main-02.jpg",
+      "https://images.example.com/dasom/main-03.jpg"
+    ]
+  }
+}
