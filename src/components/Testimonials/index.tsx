@@ -15,7 +15,7 @@ const testimonialData: Testimonial[] = [
     name: "홍성학",
     designation: "부회장",
     content:
-      "삼전 13층에 사람있어요",
+      "삼전 9층에 사람있어요",
     image: "/images/blog/author-default.png",
   },
   {
@@ -58,7 +58,7 @@ const Testimonials = () => {
             2026년도 임원진을 소개합니다
           </h2>
           <p className="text-base leading-relaxed text-white/90 md:text-lg">
-            다솜을 다솜답게, 안녕하세요 최고의 다솜 웹사이트 운영팀 임원진입니더.
+            다솜을 다솜답게, 안녕하세요 최고의 다솜 웹사이트 운영팀 임원진입니다.
           </p>
         </div>
 

@@ -1,0 +1,3 @@
+id,email,password,name,role,active,studentId
+1,admin@khu.ac.kr,dasomDASOM,다솜,admin,true,2025000001
+2,test@khu.ac.kr,test,테스트,member,true,2024000002

@@ -6,6 +6,14 @@ type LoginBody = {
   password?: string;
 };
 
+const shouldUseSecureCookie = (request: Request) => {
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  if (forwardedProto) {
+    return forwardedProto.split(",")[0].trim() === "https";
+  }
+  return new URL(request.url).protocol === "https:";
+};
+
 export async function POST(request: Request) {
   const body = (await request.json()) as LoginBody;
   const email = (body.email ?? "").trim().toLowerCase();
@@ -38,7 +46,7 @@ export async function POST(request: Request) {
   response.cookies.set("dasom_session", token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(request),
     path: "/",
     maxAge: 60 * 60 * 24,
   });

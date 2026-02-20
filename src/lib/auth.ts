@@ -18,7 +18,7 @@ export type SessionUser = {
   role: string;
 };
 
-const USERS_CSV_PATH = path.join(process.cwd(), "src/mock/users.csv");
+const USERS_CSV_PATH = path.join(process.cwd(), "public", "mock", "users.csv");
 const KHU_EMAIL_SUFFIX = "@khu.ac.kr";
 
 const parseCsvLine = (line: string) => line.split(",").map((item) => item.trim());
