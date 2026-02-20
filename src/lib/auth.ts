@@ -15,6 +15,7 @@ export type SessionUser = {
   id: string;
   email: string;
   name: string;
+  studentId: string;
   role: string;
 };
 
@@ -71,6 +72,7 @@ export const verifyLogin = async (email: string, password: string) => {
     id: target.id,
     email: target.email,
     name: target.name,
+    studentId: target.studentId,
     role: target.role,
   };
 
@@ -138,6 +140,7 @@ export const registerMockUser = async (input: {
     id: nextId,
     email,
     name,
+    studentId,
     role: "member",
   };
 
@@ -160,7 +163,10 @@ export const decodeSessionToken = (token?: string): SessionUser | null => {
       return null;
     }
 
-    return parsed;
+    return {
+      ...parsed,
+      studentId: parsed.studentId ?? "",
+    };
   } catch {
     return null;
   }
