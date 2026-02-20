@@ -1,7 +1,7 @@
 ---
 title: 2026 신입부원 OT FAQ
 date: 2026-02-19
-tags: 공지
+tags: 공지/행사,공지/모집
 authorName: 이동주
 authorDesignation: 사이트제작
 ---

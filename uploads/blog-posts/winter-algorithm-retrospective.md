@@ -2,7 +2,7 @@
 title: 겨울방학 알고리즘 스터디 회고
 excerpt: 8주간의 알고리즘 스터디 운영 결과와 다음 시즌 개선안을 공유합니다.
 date: 2026-01-28
-tags: 스터디
+tags: 스터디/알고리즘
 authorName: 김다솜
 authorImage: /images/blog/author-02.png
 authorDesignation: 교육부

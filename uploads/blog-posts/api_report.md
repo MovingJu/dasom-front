@@ -1,7 +1,7 @@
 ---
 title: Api 명세 관련 공지
 date: 3000-04-25
-tags: 공지
+tags: 공지/사이트
 authorName: 이동주
 authorDesignation: 사이트제작
 ---
@@ -170,6 +170,8 @@ authorDesignation: 사이트제작
 동작:
 - `date`는 서버의 현재 날짜(YYYY-MM-DD)로 자동 저장
 - `authorName`, `authorDesignation`은 로그인 세션 사용자 정보로 자동 저장
+- `tags`는 쉼표로 구분하여 입력하며, `태그1/태그2` 형식을 사용하면 계층 태그로 저장/조회됨
+- 글 저장 시 입력된 태그는 `public/blog-tags.json`에 자동 반영됨(없는 경로는 자동 추가)
 
 ### Success `200`
 ```json
@@ -177,7 +179,7 @@ authorDesignation: 사이트제작
   "ok": true,
   "slug": "2026-1학기-공지",
   "fileName": "2026-1학기-공지.md",
-  "path": "public/blog-posts/2026-1학기-공지.md",
+  "path": "uploads/blog-posts/2026-1학기-공지.md",
   "detailUrl": "/blog/2026-1학기-공지"
 }
 ```

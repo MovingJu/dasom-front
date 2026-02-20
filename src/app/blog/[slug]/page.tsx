@@ -1,5 +1,11 @@
-import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/blog";
+import {
+  getAllBlogPosts,
+  getBlogPostBySlug,
+  getBlogTagRoot,
+  splitBlogTagPath,
+} from "@/lib/blog";
 import { decodeSessionToken } from "@/lib/auth";
+import { getBlogTagCatalog, hasBlogTagPath } from "@/lib/blogTagCatalog";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Image from "next/image";
@@ -41,16 +47,24 @@ const BlogDetailPage = async ({ params }: PageProps) => {
     notFound();
   }
 
-  const isNoticePost = post.tags.some((tag) => tag.trim() === "공지");
+  const isNoticePost = post.tags.some((tag) => getBlogTagRoot(tag) === "공지");
   const cookieStore = await cookies();
   const token = cookieStore.get("dasom_session")?.value;
   const user = decodeSessionToken(token);
+  const catalog = await getBlogTagCatalog();
 
   if (!user && !isNoticePost) {
     redirect(`/signin?next=${encodeURIComponent(`/blog/${slug}`)}`);
   }
   const authorImage =
     post.author.image?.trim() || "/images/blog/author-default.png";
+  const getTagHref = (tag: string) => {
+    const pathParts = splitBlogTagPath(tag);
+    if (!hasBlogTagPath(catalog, pathParts)) {
+      return null;
+    }
+    return `/blog?tagPath=${encodeURIComponent(pathParts.join("/"))}`;
+  };
 
   return (
     <section className="pb-[120px] pt-[150px]">
@@ -85,15 +99,25 @@ const BlogDetailPage = async ({ params }: PageProps) => {
               <div className="mt-10 border-t border-body-color/10 pt-6 dark:border-white/10">
                 <h4 className="mb-4 text-sm font-medium text-body-color">Tags</h4>
                 <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
-                    <Link
-                      key={tag}
-                      href={`/blog?tag=${encodeURIComponent(tag)}`}
-                      className="bg-primary/10 text-primary inline-flex rounded-full px-3 py-1 text-xs font-semibold"
-                    >
-                      #{tag}
-                    </Link>
-                  ))}
+                  {post.tags.map((tag) => {
+                    const href = getTagHref(tag);
+                    return href ? (
+                      <Link
+                        key={tag}
+                        href={href}
+                        className="bg-primary/10 text-primary inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                      >
+                        #{tag}
+                      </Link>
+                    ) : (
+                      <span
+                        key={tag}
+                        className="inline-flex rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-600 dark:bg-white/10 dark:text-white/60"
+                      >
+                        #{tag}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             ) : null}

@@ -1,7 +1,7 @@
 ---
 title: 블로그 글 테스트
 date: 2026-01-28
-tags: 테스트
+tags: 테스트/태그/기능
 authorName: 이동주
 authorDesignation: 사이트제작
 ---
