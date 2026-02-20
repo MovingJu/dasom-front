@@ -33,3 +33,7 @@ yarn-error.log*
 
 # environments
 .env
+
+# typescript build cache
+tsconfig.tsbuildinfo
+

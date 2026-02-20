@@ -247,6 +247,104 @@ authorDesignation: 사이트제작
 
 ---
 
+## 8) 족보 글 생성 (로그인 필요)
+- Method: `POST`
+- Path: `/api/zokbo/create`
+- Auth: `dasom_session` 쿠키 필요
+- Content-Type: `application/json`
+
+### Request Body
+```json
+{
+  "title": "운영체제 중간고사 핵심 정리",
+  "tags": ["운영체제", "알고리즘"],
+  "content": "# 본문\n\n마크다운 내용",
+  "attachments": [
+    {
+      "name": "oop-points.txt",
+      "url": "/zokbo/20260220160510-oop-points-a1b2c3d4.txt"
+    }
+  ]
+}
+```
+
+제약:
+- `title`, `content` 필수
+- `tags`는 1개 이상 필수
+- `tags`는 **기존 족보에 이미 존재하는 태그 중에서만** 선택 가능
+- `attachments`는 1개 이상 필수
+- `attachments.url`은 `/zokbo/*`만 허용
+- 서버에서 첨부파일 실존 여부를 검증
+
+동작:
+- `date`는 서버 현재 날짜(YYYY-MM-DD)로 자동 저장
+- `authorName`, `authorDesignation`은 로그인 세션 사용자 정보로 자동 저장
+- 저장 시 본문 하단에 `## 첨부파일` 목록이 자동 추가됨(없을 때)
+
+### Success `200`
+```json
+{
+  "ok": true,
+  "slug": "운영체제-중간고사-핵심-정리",
+  "fileName": "운영체제-중간고사-핵심-정리.md",
+  "path": "zokbo/운영체제-중간고사-핵심-정리.md",
+  "detailUrl": "/zokbo/운영체제-중간고사-핵심-정리",
+  "attachments": [
+    {
+      "name": "oop-points.txt",
+      "url": "/zokbo/20260220160510-oop-points-a1b2c3d4.txt"
+    }
+  ]
+}
+```
+
+### Error
+- `400`: 제목/본문 누락, 태그 누락, 첨부파일 누락, 허용되지 않은 태그/경로, 파일 없음
+- `401`: 로그인 세션 없음
+
+---
+
+## 9) 족보 파일 업로드 (로그인 필요)
+- Method: `POST`
+- Path: `/api/zokbo/upload`
+- Auth: `dasom_session` 쿠키 필요
+- Content-Type: `multipart/form-data`
+
+### Request Body (form-data)
+- `files`: 파일 1개 이상 (다중 업로드 가능)
+
+제약:
+- 파일 **개수 제한 없음**
+- 파일 형식 제한 없음 (pdf, csv, zip, txt 등)
+- 파일당 최대 1GB
+
+### Success `200`
+```json
+{
+  "ok": true,
+  "files": [
+    {
+      "originalName": "oop-points.txt",
+      "fileName": "20260220160510-oop-points-a1b2c3d4.txt",
+      "url": "/zokbo/20260220160510-oop-points-a1b2c3d4.txt",
+      "size": 198,
+      "mimeType": "text/plain"
+    }
+  ]
+}
+```
+
+### Error
+- `400`: 파일 누락, 파일 크기 초과
+- `401`: 로그인 세션 없음
+- `413`: 업로드 본문 크기 제한 초과(프록시/게이트웨이 제한)
+
+운영 환경 참고:
+- Nginx 사용 시 `client_max_body_size`를 1GB 이상으로 설정해야 대용량 업로드 가능
+- Next.js는 `next.config.js`의 `experimental.proxyClientMaxBodySize`를 1GB로 설정
+
+---
+
 ## Mock 계정 (src/mock/users.csv)
 1. `admin@dasom.dev / dasom123!` (active)
 

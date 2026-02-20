@@ -34,7 +34,7 @@ type CodeTokenType =
   | "operator"
   | "punctuation";
 
-const BLOG_DIR = path.join(process.cwd(), "blog");
+const BLOG_DIR = path.join(process.cwd(), "public", "blog-posts");
 
 const escapeHtml = (value: string) =>
   value

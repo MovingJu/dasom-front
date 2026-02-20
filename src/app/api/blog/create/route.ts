@@ -11,7 +11,7 @@ type CreateBlogBody = {
   content?: string;
 };
 
-const BLOG_DIR = path.join(process.cwd(), "blog");
+const BLOG_DIR = path.join(process.cwd(), "public", "blog-posts");
 
 const cleanLine = (value: string) => value.replace(/\r?\n/g, " ").trim();
 
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
     ok: true,
     slug,
     fileName,
-    path: `blog/${fileName}`,
+    path: `public/blog-posts/${fileName}`,
     detailUrl: `/blog/${slug}`,
   });
 }
