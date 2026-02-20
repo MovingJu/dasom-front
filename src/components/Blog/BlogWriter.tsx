@@ -269,10 +269,13 @@ const BlogWriter = () => {
             <input
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              placeholder="태그 (쉼표 구분)"
+              placeholder="태그 (쉼표 구분, 예: 공지/회비,스터디/알고리즘)"
               className="border-body-color/20 focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-4 py-3 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
             />
           </div>
+          <p className="text-body-color text-xs">
+            태그는 <code>태그1/태그2</code> 형식으로 입력하면 하위 태그로 처리됩니다.
+          </p>
 
           <div className="overflow-hidden rounded-xs border border-body-color/20 dark:border-white/15">
             <div className="flex items-center justify-between border-b border-body-color/20 bg-[#f8f8f8] px-2 py-2 dark:border-white/15 dark:bg-[#2f2a2e]">

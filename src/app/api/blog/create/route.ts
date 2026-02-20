@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { decodeSessionToken } from "@/lib/auth";
+import { addBlogTagPaths } from "@/lib/blogTagCatalog";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -99,6 +100,11 @@ export async function POST(request: Request) {
 
   await fs.mkdir(BLOG_DIR, { recursive: true });
   await fs.writeFile(fullPath, fileBody, "utf8");
+  const tagPaths = tags
+    .split(",")
+    .map((tag) => cleanLine(tag))
+    .filter(Boolean);
+  await addBlogTagPaths(tagPaths);
 
   return NextResponse.json({
     ok: true,

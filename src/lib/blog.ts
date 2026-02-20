@@ -20,7 +20,8 @@ export type BlogPost = {
 
 type BlogFilter = {
   query?: string;
-  tag?: string;
+  tagPath?: string;
+  tagPaths?: string[];
 };
 
 type CodeTokenType =
@@ -404,7 +405,7 @@ const normalizePost = (slug: string, meta: Record<string, string>, content: stri
   const date = meta.date || "1970-01-01";
   const tags = (meta.tags || "")
     .split(",")
-    .map((tag) => tag.trim())
+    .map((tag) => tag.trim().replace(/^#+/, "").trim())
     .filter(Boolean);
 
   return {
@@ -453,13 +454,45 @@ export const getBlogPostBySlug = async (slug: string) => {
 
 const normalize = (value: string) => value.trim().toLowerCase();
 
+export const splitBlogTagPath = (tag: string) =>
+  tag
+    .trim()
+    .replace(/^#+/, "")
+    .split("/")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+export const getBlogTagRoot = (tag: string) => splitBlogTagPath(tag)[0] ?? "";
+
+export const getBlogTagChildPath = (tag: string) => {
+  const parts = splitBlogTagPath(tag);
+  if (parts.length <= 1) return "";
+  return parts.slice(1).join("/");
+};
+
 export const filterBlogPosts = (posts: BlogPost[], filter: BlogFilter) => {
   const query = normalize(filter.query ?? "");
-  const tag = normalize(filter.tag ?? "");
+  const requestedPaths = filter.tagPaths?.length
+    ? filter.tagPaths
+    : filter.tagPath
+      ? [filter.tagPath]
+      : [];
+
+  const selectedPathPartsList = requestedPaths
+    .map((path) => splitBlogTagPath(path).map((part) => normalize(part)))
+    .filter((parts) => parts.length > 0);
 
   return posts.filter((post) => {
     const byTag =
-      !tag || post.tags.some((postTag) => normalize(postTag) === tag);
+      selectedPathPartsList.length === 0
+        ? true
+        : post.tags.some((postTag) => {
+            const tagParts = splitBlogTagPath(postTag).map((part) => normalize(part));
+            return selectedPathPartsList.some((selectedPathParts) => {
+              if (tagParts.length < selectedPathParts.length) return false;
+              return selectedPathParts.every((part, index) => tagParts[index] === part);
+            });
+          });
 
     if (!byTag) return false;
 
@@ -484,10 +517,45 @@ export const getAllBlogTags = (posts: BlogPost[]) => {
   const tags = new Set<string>();
   for (const post of posts) {
     for (const tag of post.tags) {
-      if (tag.trim()) {
-        tags.add(tag.trim());
+      const cleaned = tag.trim().replace(/^#+/, "").trim();
+      if (cleaned) {
+        tags.add(cleaned);
       }
     }
   }
   return Array.from(tags).sort((a, b) => a.localeCompare(b, "ko"));
+};
+
+export const getBlogTagHierarchy = (posts: BlogPost[]) => {
+  const roots = new Set<string>();
+  const childrenMap = new Map<string, Set<string>>();
+
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      const root = getBlogTagRoot(tag);
+      if (!root) continue;
+      roots.add(root);
+
+      const childPath = getBlogTagChildPath(tag);
+      if (!childPath) continue;
+
+      const children = childrenMap.get(root) ?? new Set<string>();
+      children.add(childPath);
+      childrenMap.set(root, children);
+    }
+  }
+
+  const sortedRoots = Array.from(roots).sort((a, b) => a.localeCompare(b, "ko"));
+  const childrenByRoot: Record<string, string[]> = {};
+
+  for (const root of sortedRoots) {
+    childrenByRoot[root] = Array.from(childrenMap.get(root) ?? []).sort((a, b) =>
+      a.localeCompare(b, "ko"),
+    );
+  }
+
+  return {
+    roots: sortedRoots,
+    childrenByRoot,
+  };
 };
