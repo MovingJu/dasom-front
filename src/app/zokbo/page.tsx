@@ -1,5 +1,6 @@
 import { decodeSessionToken } from "@/lib/auth";
-import { filterZokboPostsByTag, getAllZokboPosts, getAllZokboTags } from "@/lib/zokbo";
+import { getAllZokboPosts } from "@/lib/zokbo";
+import { getZokboTagCatalog } from "@/lib/zokboTagCatalog";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { Metadata } from "next";
@@ -12,20 +13,23 @@ export const metadata: Metadata = {
 
 type PageProps = {
   searchParams: Promise<{
-    tag?: string;
+    professor?: string;
+    course?: string;
   }>;
 };
 
-const makeTagHref = (tag?: string) => {
+const makeTagHref = (professor?: string, course?: string) => {
   const params = new URLSearchParams();
-  if (tag?.trim()) params.set("tag", tag.trim());
+  if (professor?.trim()) params.set("professor", professor.trim());
+  if (course?.trim()) params.set("course", course.trim());
   const query = params.toString();
   return query ? `/zokbo?${query}` : "/zokbo";
 };
 
 const ZokboPage = async ({ searchParams }: PageProps) => {
   const params = await searchParams;
-  const selectedTag = (params.tag ?? "").trim();
+  const selectedProfessor = (params.professor ?? "").trim();
+  const selectedCourse = (params.course ?? "").trim();
 
   const cookieStore = await cookies();
   const token = cookieStore.get("dasom_session")?.value;
@@ -36,30 +40,56 @@ const ZokboPage = async ({ searchParams }: PageProps) => {
   }
 
   const allPosts = await getAllZokboPosts();
-  const tags = getAllZokboTags(allPosts);
-  const posts = filterZokboPostsByTag(allPosts, selectedTag);
+  const tagCatalog = await getZokboTagCatalog();
+  const posts = allPosts.filter((post) => {
+    const hasProfessor = selectedProfessor ? post.tags.includes(selectedProfessor) : true;
+    const hasCourse = selectedCourse ? post.tags.includes(selectedCourse) : true;
+    return hasProfessor && hasCourse;
+  });
 
   return (
     <>
       <section className="pb-[120px] pt-[120px]">
         <div className="container">
           <div className="mb-10 rounded-xs bg-white p-5 shadow-three dark:bg-[#3a3338]">
-            <div className="mb-4 flex flex-wrap items-center gap-2">
-              <span className="text-sm font-semibold text-black dark:text-white">태그 필터</span>
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-black dark:text-white">교수님 필터</span>
               <Link
-                href={makeTagHref()}
+                href={makeTagHref(undefined, selectedCourse)}
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  !selectedTag ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
+                  !selectedProfessor ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
                 }`}
               >
                 전체
               </Link>
-              {tags.map((tag) => (
+              {tagCatalog.professorTags.map((tag) => (
                 <Link
                   key={tag}
-                  href={makeTagHref(tag)}
+                  href={makeTagHref(tag, selectedCourse)}
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                    selectedTag === tag ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
+                    selectedProfessor === tag ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
+                  }`}
+                >
+                  #{tag}
+                </Link>
+              ))}
+            </div>
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-black dark:text-white">과목명 필터</span>
+              <Link
+                href={makeTagHref(selectedProfessor, undefined)}
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  !selectedCourse ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
+                }`}
+              >
+                전체
+              </Link>
+              {tagCatalog.courseTags.map((tag) => (
+                <Link
+                  key={tag}
+                  href={makeTagHref(selectedProfessor, tag)}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    selectedCourse === tag ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
                   }`}
                 >
                   #{tag}
@@ -68,7 +98,9 @@ const ZokboPage = async ({ searchParams }: PageProps) => {
             </div>
             <p className="text-body-color text-sm">
               총 <span className="text-primary font-semibold">{posts.length}</span>개
-              {selectedTag ? ` (태그: #${selectedTag})` : ""}
+              {(selectedProfessor || selectedCourse)
+                ? ` (교수님: ${selectedProfessor || "전체"}, 과목명: ${selectedCourse || "전체"})`
+                : ""}
             </p>
           </div>
 
@@ -124,4 +156,3 @@ const ZokboPage = async ({ searchParams }: PageProps) => {
 };
 
 export default ZokboPage;
-

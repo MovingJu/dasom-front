@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { decodeSessionToken } from "@/lib/auth";
 import ZokboWriter from "@/components/Zokbo/ZokboWriter";
-import { getAllZokboPosts, getAllZokboTags } from "@/lib/zokbo";
+import { getZokboTagCatalog } from "@/lib/zokboTagCatalog";
 
 export const metadata: Metadata = {
   title: "족보 글 작성 | DASOM",
@@ -19,11 +19,14 @@ const ZokboWritePage = async () => {
     redirect("/signin?next=/zokbo/write");
   }
 
-  const posts = await getAllZokboPosts();
-  const tags = getAllZokboTags(posts);
+  const tagCatalog = await getZokboTagCatalog();
 
-  return <ZokboWriter availableTags={tags} />;
+  return (
+    <ZokboWriter
+      professorTags={tagCatalog.professorTags}
+      courseTags={tagCatalog.courseTags}
+    />
+  );
 };
 
 export default ZokboWritePage;
-

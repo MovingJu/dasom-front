@@ -22,15 +22,17 @@ type UploadResult = {
 };
 
 type ZokboWriterProps = {
-  availableTags: string[];
+  professorTags: string[];
+  courseTags: string[];
 };
 
-const ZokboWriter = ({ availableTags }: ZokboWriterProps) => {
+const ZokboWriter = ({ professorTags, courseTags }: ZokboWriterProps) => {
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [title, setTitle] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedProfessorTag, setSelectedProfessorTag] = useState(professorTags[0] ?? "");
+  const [selectedCourseTag, setSelectedCourseTag] = useState(courseTags[0] ?? "");
   const [content, setContent] = useState("# 과목명\n\n족보 내용을 작성하세요.");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -42,16 +44,11 @@ const ZokboWriter = ({ availableTags }: ZokboWriterProps) => {
     () =>
       title.trim().length > 0 &&
       content.trim().length > 0 &&
-      selectedTags.length > 0 &&
+      selectedProfessorTag.trim().length > 0 &&
+      selectedCourseTag.trim().length > 0 &&
       uploadedFiles.length > 0,
-    [title, content, selectedTags, uploadedFiles],
+    [title, content, selectedProfessorTag, selectedCourseTag, uploadedFiles],
   );
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag],
-    );
-  };
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -66,7 +63,7 @@ const ZokboWriter = ({ availableTags }: ZokboWriterProps) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
-          tags: selectedTags,
+          tags: [selectedProfessorTag, selectedCourseTag],
           content,
           attachments: uploadedFiles.map((file) => ({ name: file.name, url: file.url })),
         }),
@@ -195,23 +192,32 @@ const ZokboWriter = ({ availableTags }: ZokboWriterProps) => {
           />
 
           <div>
-            <p className="mb-2 text-sm font-semibold text-black dark:text-white">태그 선택 (기존 태그만 가능)</p>
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => {
-                const checked = selectedTags.includes(tag);
-                return (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => toggleTag(tag)}
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      checked ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
-                    }`}
-                  >
-                    #{tag}
-                  </button>
-                );
-              })}
+            <p className="mb-2 text-sm font-semibold text-black dark:text-white">
+              태그 선택 (교수님 + 과목명 각 1개)
+            </p>
+            <div className="grid gap-3 md:grid-cols-2">
+              <select
+                value={selectedProfessorTag}
+                onChange={(e) => setSelectedProfessorTag(e.target.value)}
+                className="border-body-color/20 focus:border-primary rounded-xs border bg-[#f8f8f8] px-3 py-2 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+              >
+                {professorTags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    교수님: {tag}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedCourseTag}
+                onChange={(e) => setSelectedCourseTag(e.target.value)}
+                className="border-body-color/20 focus:border-primary rounded-xs border bg-[#f8f8f8] px-3 py-2 text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
+              >
+                {courseTags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    과목명: {tag}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

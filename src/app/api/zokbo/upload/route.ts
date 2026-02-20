@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "zokbo");
+const UPLOAD_DIR = path.join(process.cwd(), "uploads", "zokbo");
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
 
 const sanitizeBaseName = (name: string) =>
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
       file: {
         originalName: file.name,
         fileName,
-        url: `/zokbo/${encodeURIComponent(fileName)}`,
+        url: `/uploads/zokbo/${encodeURIComponent(fileName)}`,
         size: file.size,
         mimeType: file.type || "application/octet-stream",
       },

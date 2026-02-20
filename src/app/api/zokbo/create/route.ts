@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { decodeSessionToken } from "@/lib/auth";
-import { getAllZokboPosts, getAllZokboTags } from "@/lib/zokbo";
+import { getZokboTagCatalog } from "@/lib/zokboTagCatalog";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -16,8 +16,8 @@ type CreateZokboBody = {
   }>;
 };
 
-const ZOKBO_DIR = path.join(process.cwd(), "public", "zokbo-posts");
-const PUBLIC_DIR = path.join(process.cwd(), "public");
+const ZOKBO_DIR = path.join(process.cwd(), "uploads", "zokbo-posts");
+const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
 const cleanLine = (value: string) => value.replace(/\r?\n/g, " ").trim();
 
@@ -60,7 +60,7 @@ const resolvePublicPath = (urlPath: string) => {
   } catch {
     return null;
   }
-  const publicPrefix = "/zokbo/";
+  const publicPrefix = "/uploads/zokbo/";
   const fileNameRaw = normalizedUrl.startsWith(publicPrefix)
     ? normalizedUrl.slice(publicPrefix.length)
     : null;
@@ -69,8 +69,8 @@ const resolvePublicPath = (urlPath: string) => {
   const safeFileName = path.basename(fileNameRaw);
   if (!safeFileName || safeFileName !== fileNameRaw) return null;
 
-  const fullPath = path.join(PUBLIC_DIR, "zokbo", safeFileName);
-  if (!fullPath.startsWith(PUBLIC_DIR)) return null;
+  const fullPath = path.join(UPLOADS_DIR, "zokbo", safeFileName);
+  if (!fullPath.startsWith(UPLOADS_DIR)) return null;
   return fullPath;
 };
 
@@ -108,17 +108,22 @@ export async function POST(request: Request) {
   if (!content) {
     return NextResponse.json({ error: "본문을 입력해 주세요." }, { status: 400 });
   }
-  if (incomingTags.length === 0) {
-    return NextResponse.json({ error: "태그를 1개 이상 선택해 주세요." }, { status: 400 });
+  if (incomingTags.length !== 2) {
+    return NextResponse.json({ error: "태그는 교수님 1개, 과목명 1개로 총 2개 선택해야 합니다." }, { status: 400 });
   }
   if (attachments.length === 0) {
     return NextResponse.json({ error: "파일을 1개 이상 업로드해 주세요." }, { status: 400 });
   }
 
-  const allowedTags = new Set(getAllZokboTags(await getAllZokboPosts()));
-  const invalidTag = incomingTags.find((tag) => !allowedTags.has(tag));
-  if (invalidTag) {
-    return NextResponse.json({ error: `허용되지 않은 태그입니다: ${invalidTag}` }, { status: 400 });
+  const [professorTag, courseTag] = incomingTags;
+  const tagCatalog = await getZokboTagCatalog();
+
+  if (!tagCatalog.professorTags.includes(professorTag)) {
+    return NextResponse.json({ error: `허용되지 않은 교수님 태그입니다: ${professorTag}` }, { status: 400 });
+  }
+
+  if (!tagCatalog.courseTags.includes(courseTag)) {
+    return NextResponse.json({ error: `허용되지 않은 과목명 태그입니다: ${courseTag}` }, { status: 400 });
   }
 
   for (const attachment of attachments) {
@@ -162,7 +167,7 @@ export async function POST(request: Request) {
     ok: true,
     slug,
     fileName,
-    path: `public/zokbo-posts/${fileName}`,
+    path: `uploads/zokbo-posts/${fileName}`,
     detailUrl: `/zokbo/${slug}`,
     attachments,
   });
