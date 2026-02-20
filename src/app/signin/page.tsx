@@ -1,5 +1,6 @@
 import SigninForm from "@/components/Auth/SigninForm";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "로그인 | DASOM",
@@ -7,7 +8,11 @@ export const metadata: Metadata = {
 };
 
 const SigninPage = () => {
-  return <SigninForm />;
+  return (
+    <Suspense fallback={<div className="pt-[180px]" />}>
+      <SigninForm />
+    </Suspense>
+  );
 };
 
 export default SigninPage;

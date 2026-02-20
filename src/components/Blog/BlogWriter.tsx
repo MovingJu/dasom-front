@@ -18,9 +18,87 @@ type UploadResult = {
   error?: string;
 };
 
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+
+const markdownToPreviewHtml = (markdown: string) => {
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const out: string[] = [];
+  let i = 0;
+
+  const renderInline = (line: string) => {
+    const escaped = escapeHtml(line);
+    return escaped
+      .replace(/`([^`]+)`/g, "<code class=\"rounded bg-primary/10 px-1 py-0.5 text-primary\">$1</code>")
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+      .replace(/~~([^~]+)~~/g, "<del>$1</del>")
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="my-6 w-full rounded-md" />')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline">$1</a>');
+  };
+
+  while (i < lines.length) {
+    const line = lines[i].trim();
+
+    if (!line) {
+      i += 1;
+      continue;
+    }
+
+    if (line.startsWith("```")) {
+      const codeLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("```")) {
+        codeLines.push(lines[i]);
+        i += 1;
+      }
+      i += 1;
+      out.push(
+        `<pre class="mb-6 overflow-x-auto rounded-md bg-[#1e1e1e] p-4 text-sm text-[#d4d4d4]"><code>${escapeHtml(codeLines.join("\n"))}</code></pre>`,
+      );
+      continue;
+    }
+
+    const h = line.match(/^(#{1,6})\s+(.+)$/);
+    if (h) {
+      const level = h[1].length;
+      out.push(`<h${level} class="mb-4 font-bold text-black dark:text-white">${renderInline(h[2])}</h${level}>`);
+      i += 1;
+      continue;
+    }
+
+    if (line.startsWith("> ")) {
+      out.push(`<blockquote class="mb-6 border-l-4 border-primary bg-primary/10 p-4">${renderInline(line.slice(2))}</blockquote>`);
+      i += 1;
+      continue;
+    }
+
+    if (line.startsWith("- ")) {
+      const items: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith("- ")) {
+        items.push(`<li>${renderInline(lines[i].trim().slice(2))}</li>`);
+        i += 1;
+      }
+      out.push(`<ul class="mb-6 list-inside list-disc space-y-2">${items.join("")}</ul>`);
+      continue;
+    }
+
+    out.push(`<p class="mb-6 text-base leading-relaxed">${renderInline(line)}</p>`);
+    i += 1;
+  }
+
+  return out.join("\n");
+};
+
 const BlogWriter = () => {
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [mode, setMode] = useState<"write" | "preview">("write");
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState("");
   const [content, setContent] = useState("# 새 글 제목\n\n본문을 작성하세요.");
@@ -33,6 +111,7 @@ const BlogWriter = () => {
     () => title.trim().length > 0 && content.trim().length > 0,
     [title, content],
   );
+  const previewHtml = useMemo(() => markdownToPreviewHtml(content), [content]);
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -89,6 +168,45 @@ const BlogWriter = () => {
     requestAnimationFrame(() => {
       textarea.focus();
       textarea.setSelectionRange(cursor, cursor);
+    });
+  };
+
+  const wrapSelection = (prefix: string, suffix = prefix, placeholder = "텍스트") => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+    const selected = content.slice(start, end);
+    const value = selected || placeholder;
+    const inserted = `${prefix}${value}${suffix}`;
+    const next = `${content.slice(0, start)}${inserted}${content.slice(end)}`;
+    setContent(next);
+
+    requestAnimationFrame(() => {
+      textarea.focus();
+      if (selected) {
+        textarea.setSelectionRange(start + prefix.length, start + prefix.length + value.length);
+      } else {
+        textarea.setSelectionRange(start + prefix.length, start + prefix.length + placeholder.length);
+      }
+    });
+  };
+
+  const insertLinePrefix = (prefix: string, fallback = "내용") => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+    const selected = content.slice(start, end) || fallback;
+    const nextText = selected
+      .split("\n")
+      .map((line) => `${prefix}${line}`)
+      .join("\n");
+    const next = `${content.slice(0, start)}${nextText}${content.slice(end)}`;
+    setContent(next);
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start, start + nextText.length);
     });
   };
 
@@ -156,13 +274,57 @@ const BlogWriter = () => {
             />
           </div>
 
-          <textarea
-            ref={textareaRef}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="border-body-color/20 focus:border-primary h-[420px] w-full rounded-xs border bg-[#f8f8f8] p-4 font-mono text-sm outline-hidden dark:border-white/15 dark:bg-[#2f2a2e] dark:text-white"
-            spellCheck={false}
-          />
+          <div className="overflow-hidden rounded-xs border border-body-color/20 dark:border-white/15">
+            <div className="flex items-center justify-between border-b border-body-color/20 bg-[#f8f8f8] px-2 py-2 dark:border-white/15 dark:bg-[#2f2a2e]">
+              {mode === "write" ? (
+                <div className="flex flex-wrap items-center gap-1">
+                  <button type="button" onClick={() => wrapSelection("**")} className="rounded bg-primary/10 px-2 py-1 text-xs text-primary">B</button>
+                  <button type="button" onClick={() => wrapSelection("*")} className="rounded bg-primary/10 px-2 py-1 text-xs text-primary italic">I</button>
+                  <button type="button" onClick={() => wrapSelection("~~")} className="rounded bg-primary/10 px-2 py-1 text-xs text-primary line-through">S</button>
+                  <button type="button" onClick={() => wrapSelection("`")} className="rounded bg-primary/10 px-2 py-1 text-xs text-primary">Code</button>
+                  <button type="button" onClick={() => wrapSelection("[", "](https://)") } className="rounded bg-primary/10 px-2 py-1 text-xs text-primary">Link</button>
+                  <button type="button" onClick={() => insertLinePrefix("# ")} className="rounded bg-primary/10 px-2 py-1 text-xs text-primary">H1</button>
+                  <button type="button" onClick={() => insertLinePrefix("> ")} className="rounded bg-primary/10 px-2 py-1 text-xs text-primary">Quote</button>
+                  <button type="button" onClick={() => insertLinePrefix("- ")} className="rounded bg-primary/10 px-2 py-1 text-xs text-primary">List</button>
+                </div>
+              ) : <div />}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMode("write")}
+                  className={`rounded-xs px-3 py-1 text-xs font-semibold ${
+                    mode === "write" ? "bg-primary text-white" : "bg-primary/10 text-primary"
+                  }`}
+                >
+                  Write
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("preview")}
+                  className={`rounded-xs px-3 py-1 text-xs font-semibold ${
+                    mode === "preview" ? "bg-primary text-white" : "bg-primary/10 text-primary"
+                  }`}
+                >
+                  Preview
+                </button>
+              </div>
+            </div>
+
+            {mode === "write" ? (
+              <textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="h-[420px] w-full bg-white p-4 font-mono text-sm outline-hidden dark:bg-[#2f2a2e] dark:text-white"
+                spellCheck={false}
+              />
+            ) : (
+              <div
+                className="h-[420px] overflow-y-auto bg-white p-4 text-[#2f1d30] dark:bg-[#2f2a2e] dark:text-white"
+                dangerouslySetInnerHTML={{ __html: previewHtml }}
+              />
+            )}
+          </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <label className="bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer rounded-xs px-5 py-3 text-sm font-semibold">

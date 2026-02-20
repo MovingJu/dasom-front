@@ -1,4 +1,0 @@
-id,email,password,name,role,active,studentId
-1,admin@khu.ac.kr,dasomDASOM,관리자,admin,true,2025000001
-2,test@khu.ac.kr,test,테스트,member,true,2024000002
-3,movingju06@khu.ac.kr,dlehdwn0425,사이트제작,member,true,2023000003

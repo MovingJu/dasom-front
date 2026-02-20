@@ -1,4 +1,5 @@
-import mockMainPageResponse from "@/mock/main-page.json";
+import { promises as fs } from "node:fs";
+import path from "node:path";
 
 export type MainPageAboutUsNumber = {
   key: string;
@@ -43,15 +44,19 @@ const getMainPageUrl = (): string => {
   return `${protocol}://${host}:${port}${path}`;
 };
 
-const getMockData = (): MainPageData => {
-  return (mockMainPageResponse as MainPageApiResponse).data;
+const MAIN_PAGE_MOCK_PATH = path.join(process.cwd(), "public", "mock", "main-page.json");
+
+const getMainPageMockData = async (): Promise<MainPageData> => {
+  const raw = await fs.readFile(MAIN_PAGE_MOCK_PATH, "utf8");
+  const parsed = JSON.parse(raw) as MainPageApiResponse;
+  return parsed.data;
 };
 
 export const getMainPageData = async (): Promise<MainPageData> => {
   const useMock = toBoolean(process.env.DASOM_USE_MOCK);
 
   if (useMock) {
-    return getMockData();
+    return getMainPageMockData();
   }
 
   try {
@@ -72,6 +77,6 @@ export const getMainPageData = async (): Promise<MainPageData> => {
 
     return payload.data;
   } catch {
-    return getMockData();
+    return getMainPageMockData();
   }
 };
