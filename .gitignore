@@ -37,3 +37,8 @@ yarn-error.log*
 # typescript build cache
 tsconfig.tsbuildinfo
 
+# user uploads
+/uploads/*
+!/uploads/blog-posts/
+/uploads/blog-posts/*
+!/uploads/blog-posts/api_report.md

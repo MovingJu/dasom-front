@@ -19,7 +19,7 @@ const zokboData: ZokboItem[] = [
     ],
     tags: ["전공", "자료구조", "중간고사"],
     semester: "2025-2",
-    file: "/zokbo/data-structure-midterm.txt",
+    file: "/uploads/zokbo/data-structure-midterm.txt",
   },
   {
     id: 2,
@@ -32,7 +32,7 @@ const zokboData: ZokboItem[] = [
     ],
     tags: ["기출", "객체지향", "요약"],
     semester: "2025-2",
-    file: "/zokbo/oop-points.txt",
+    file: "/uploads/zokbo/oop-points.txt",
   },
   {
     id: 3,
@@ -45,7 +45,7 @@ const zokboData: ZokboItem[] = [
     ],
     tags: ["정리", "알고리즘", "체크리스트"],
     semester: "2026-1",
-    file: "/zokbo/algorithm-checklist.txt",
+    file: "/uploads/zokbo/algorithm-checklist.txt",
   },
 ];
 

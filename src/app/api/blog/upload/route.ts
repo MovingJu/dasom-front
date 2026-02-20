@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "blog");
+const UPLOAD_DIR = path.join(process.cwd(), "uploads", "images");
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const MIME_TO_EXT: Record<string, string> = {
   "image/png": "png",
@@ -65,6 +65,6 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     fileName,
-    url: `/uploads/blog/${fileName}`,
+    url: `/uploads/images/${fileName}`,
   });
 }

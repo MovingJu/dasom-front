@@ -13,8 +13,7 @@ export type ZokboPost = {
   html: string;
 };
 
-const ZOKBO_DIR = path.join(process.cwd(), "public", "zokbo-posts");
-const DEFAULT_ZOKBO_TAGS = ["알고리즘", "운영체제", "자료구조", "객체지향", "컴퓨터구조"];
+const ZOKBO_DIR = path.join(process.cwd(), "uploads", "zokbo-posts");
 
 const escapeHtml = (value: string) =>
   value
@@ -120,7 +119,7 @@ const extractAttachments = (markdown: string) => {
     const name = (match[1] ?? "").trim();
     const url = (match[2] ?? "").trim();
     if (!name || !url) continue;
-    if (!url.startsWith("/zokbo/")) {
+    if (!url.startsWith("/uploads/zokbo/")) {
       continue;
     }
     files.push({ name, url });
@@ -181,7 +180,6 @@ export const getAllZokboTags = (posts: ZokboPost[]) => {
   for (const post of posts) {
     for (const tag of post.tags) tags.add(tag);
   }
-  if (tags.size === 0) return DEFAULT_ZOKBO_TAGS;
   return Array.from(tags).sort((a, b) => a.localeCompare(b, "ko"));
 };
 
